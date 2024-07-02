@@ -11,8 +11,12 @@ app.use(cors({
 }))
 app.use(express.json({limit : '17kb'}))
 
-app.get('/',(req,res) => {
-    res.json({message : "server started"})
-})
+
+
+//routes imports 
+import {userRouter} from './routes/user.routes.js';
+
+app.use('/api/v1/users',userRouter)
+
 
 
