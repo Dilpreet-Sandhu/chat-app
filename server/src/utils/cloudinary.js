@@ -21,8 +21,6 @@ export async function uploadToCloudinary(filepath) {
             throw new ApiError(400,"error while uploading file")
         }
 
-
-        fs.unlink(filepath)
         return upload
 
     } catch (error) {
