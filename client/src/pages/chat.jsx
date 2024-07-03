@@ -1,12 +1,12 @@
 import React from 'react'
 import AppLayout from '../components/layout/AppLayout'
 
-function Home() {
+function Chat() {
   return (
     <div>
-      home
+      sfjka;f
     </div>
   )
 }
 
-export default AppLayout()(Home)
+export default AppLayout()(Chat)
