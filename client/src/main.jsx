@@ -7,6 +7,8 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <CssBaseline/>
+    <div onContextMenu={(e) => e.preventDefault()}>
     <App />
+    </div>
   </React.StrictMode>,
 )
