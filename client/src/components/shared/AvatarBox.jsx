@@ -20,7 +20,7 @@ const AvatarBox = ({avatar=[],max="4"}) => {
                             xs : `${0.5 + index}rem`,
                             sm : `${index}rem`
                         },
-                        top : '3px'
+                       top : '3px'
                     }}
                     />
                 })

@@ -1,16 +1,21 @@
 import { Dialog, DialogTitle, InputAdornment, List, ListItem, ListItemText, Stack, TextField } from '@mui/material'
-import React from 'react';
+import React, { useState } from 'react';
 import {useInputValidation} from '6pp'
 import { Search } from '@mui/icons-material';
+import UserItem from './UserItem';
+import chats from '../shared/sample';
 
 function SearchDialogue() {
 
   const search = useInputValidation('');
-  const users = [1,352,6,7,1];
+  const [users,setUsers] = useState(chats)
+
+  const addFriendHandler = () => console.log('add friend')
+  let addFriendHandlerLoading = false;
 
   return (
     <Dialog open>
-      <Stack p={"2rem"} direction={"column"} alignItems={"center"} width={"25rem"}>
+      <Stack p={"5px"} direction={"column"} alignItems={"center"} width={"25rem"}>
       <DialogTitle textAlign={"center"}>Find people</DialogTitle>
       <TextField
        value={search.value} 
@@ -27,12 +32,10 @@ function SearchDialogue() {
        }}
        />
 
-        <List>
+        <List sx={{width:'80%'}}>
           {
             users.map((user) => {
-              return <ListItem>
-                <ListItemText/>
-              </ListItem>
+              return <UserItem user={user} handler={addFriendHandler} handlerIsLoading={addFriendHandlerLoading}/>
             })
           }
         </List>
