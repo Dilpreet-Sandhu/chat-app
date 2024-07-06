@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/login.jsx";
 import ProtectedRoutes from "./components/auth/protectedRote.jsx";
 import Loaders from "./components/loaders/loaders.jsx";
+import AdminLogin from "./pages/admin/AdminLogin.jsx";
 const Home = lazy(() => import("./pages/home.jsx"));
 // const Login = lazy(() => import('./pages/login.jsx'));
 const Chat = lazy(() => import("./pages/chat.jsx"));
@@ -23,6 +24,10 @@ function App() {
         <Route path="/login" element={<ProtectedRoutes redirect="/" user={!user}>
           <Login />
         </ProtectedRoutes>} />
+
+        <Route path="/admin" element={<AdminLogin/>}/>
+        <Route/>
+
       <Route path="*" element={<h1>Error 404 not found</h1>}/>
       </Routes>
       </Suspense>

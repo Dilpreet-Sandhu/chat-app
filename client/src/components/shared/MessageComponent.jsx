@@ -2,6 +2,7 @@ import { Box, Typography } from '@mui/material';
 import moment from 'moment';
 import React from 'react'
 import { fileFormat } from '../../lib/feautres';
+import ShowAttachment from './showAttachment';
 
 const MessageComponent = ({message,user}) => {
 
@@ -35,7 +36,8 @@ const MessageComponent = ({message,user}) => {
             const url = attachment.url;
             const file = fileFormat(url);
             return <Box key={idx}>
-                <a href="" target='_blank' download style={{color:"black"}}></a>
+                <a href={url} target='_blank' style={{color:"black"}}>{<ShowAttachment file={file} url={url}/>}</a>
+                
             </Box>
         })
     }

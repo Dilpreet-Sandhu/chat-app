@@ -15,7 +15,7 @@ const ChatList = ({
     memebers=[],
 }) => {
   return (
-    <Stack  width={w} direction="column">
+    <Stack sx={{overflow:"auto",height:"100%"}} width={w} direction="column">
         {
             chats?.map((data,idx) => {
 
