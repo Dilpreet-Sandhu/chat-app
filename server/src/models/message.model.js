@@ -1,24 +1,26 @@
 import {Schema,model} from 'mongoose';
 
-
 const messageSchema = new Schema({
-    text : {
-        type : String,
-        default : ""
+    sender : {
+        type:Schema.Types.ObjectId,
+        ref:"User",
+        required:true
     },
-    imageUrl : {
-        type : String,
-        default : ""
+    chat : {
+        type:Schema.Types.ObjectId,
+        ref:"Chat",
+        required:true
     },
-    videoUrl : {
-        type : String,
-        default : ""
-    },
-    seen : {
-        type : Boolean,
-        default : false
-    }
-},{timestamps : true});
+    content : String || Number,
+    attachments : [
+        {
+            url :{
+                type:String
+            }
+        }
+    ]
+},{timestamps:true})
 
 
-export const Message = model("Message",messageSchema);
+
+export const Message = model('Message',messageSchema)

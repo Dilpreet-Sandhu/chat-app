@@ -7,6 +7,9 @@ const userSchema = new Schema({
         type : String,
         required : [true,"useranem is required"]
     },
+    bio : {
+        type : String,
+    },
     email : {
         type : String,
         required : [true,"email is required "],
@@ -16,9 +19,12 @@ const userSchema = new Schema({
         type : String,
         required : [true,"password is required"]
     },
-    profilePic : {
+    avatar : {
         type : String,
         default : ""
+    },
+    refreshToken :{
+        type:String
     }
 },{timestamps : true});
 

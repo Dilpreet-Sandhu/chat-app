@@ -14,3 +14,8 @@ export class ApiResponse {
         this.message = message;
     }
 }
+
+export const cookieOptions = {
+    httpOnly : true,
+    secure:true
+}
