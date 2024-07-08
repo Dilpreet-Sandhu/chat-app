@@ -1,11 +1,23 @@
 export class ApiError extends Error {
-    constructor(status,message) {
-        super();
-        this.status = status;
-        this.message = message || this.message;
+    constructor(
+        statusCode,
+        message = "something went wrong",
+        errors = [],
+        stack = ""
+    ) {
+        super(message);
+        this.statusCode = statusCode;
+        this.data = null;
+        this.errors = errors;
+        this.success = false;
+        if (stack) {
+            this.stack = stack;
+        }
+        else {
+            Error.captureStackTrace(this,this.constructor)
+        }
     }
 }
-
 
 export class ApiResponse {
     constructor(status,data,message) {
@@ -16,6 +28,6 @@ export class ApiResponse {
 }
 
 export const cookieOptions = {
-    httpOnly : true,
+    httponly : true,
     secure:true
 }

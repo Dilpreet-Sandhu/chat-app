@@ -78,13 +78,13 @@ export const loginUser = async (req,res) => {
 
     const {accessToken,refreshToken} = await generateTokens(user._id);
 
-    const newUser = await User.findById(user._id);
+    const newUser = await User.findById(user._id).select("-password");
     newUser.refreshToken = refreshToken;
     await newUser.save({validateBeforeSave:false})
-
-    res.status(200)
-    .cookie('accessToken',accessToken,cookieOptions)
-    .cookie('refreshToken',refreshToken,cookieOptions)
+    
+   return  res.status(200)
+    .cookie('accessToken',accessToken)
+    .cookie('refreshToken',refreshToken)
     .json(
         new ApiResponse(200,newUser,"user logged in successfully")
     )
@@ -93,6 +93,7 @@ export const loginUser = async (req,res) => {
 }
 
 export const logoutUser = async (req,res) => {
+
     
     const user = await User.findByIdAndUpdate(req.user?._id,{
         $unset : {
@@ -113,4 +114,23 @@ export const logoutUser = async (req,res) => {
     .json(
         new ApiResponse(200,{},"user logged out successfully")
     )
+}
+
+export const getUserByName = async (req,res) => {
+
+    const {name} = req.query;
+
+    if (!name) throw new ApiError(400,"no name detected");
+
+    const user = await User.find({name : name}).select("-password -refreshToken");
+
+    if (!user) {
+        throw new ApiError(400,"no user found for the given name")
+    }
+
+
+    res.status(200)
+    .json(new ApiResponse(200,user,"fetched user successfully"))
+
+
 }

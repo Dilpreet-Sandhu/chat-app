@@ -13,7 +13,7 @@ const ChatManagement = lazy(() => import('./pages/admin/ChatManagement.jsx'))
 const UserMangement = lazy(() => import('./pages/admin/UserMangement.jsx'))
 const MessageManagement = lazy(() => import('./pages/admin/MessageManagement.jsx'))
 
-let user = false;
+let user = true;
 
 function App() {
   return (

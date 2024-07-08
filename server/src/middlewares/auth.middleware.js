@@ -2,9 +2,9 @@ import {ApiError,ApiResponse} from '../utils/apiHanlder.js'
 import jwt from 'jsonwebtoken';
 import {User} from '../models/user.model.js'
 
-export const verifyJWT = async (req,res,next) => {
+export const verifyJWT = async (req,_,next) => {
     try {
-        const token = req.cookies?.accessToken;
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
 
         if (!token) {
             throw new ApiError(400,'you are not logged in')
@@ -16,7 +16,7 @@ export const verifyJWT = async (req,res,next) => {
             throw new ApiError(400,"couldn't decode the token")
         }
 
-        const user = await User.findById(decodedToken._id);
+        const user = await User.findById(decodedToken._id).select('-password -refreshToken')
 
         if (!user) {
             throw new ApiError(400,"no user found")
@@ -26,6 +26,6 @@ export const verifyJWT = async (req,res,next) => {
         next()
 
     } catch (error) {
-        throw new ApiError(400,error.message || 'somethin went wrong')
+        throw new ApiError(400,error)
     }
 }
