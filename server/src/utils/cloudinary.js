@@ -21,6 +21,7 @@ export async function uploadToCloudinary(filepath) {
             throw new ApiError(400,"error while uploading file")
         }
 
+        fs.unlink(filepath,(err) => {if (err) console.log(err)})
         return upload
 
     } catch (error) {
@@ -28,4 +29,21 @@ export async function uploadToCloudinary(filepath) {
         console.log(error)
     }
 
+}
+
+
+export async function deleteFromCloudinary(url) {
+    try {
+        const slashArr = url.split('/');
+        const lastSlashElement = slashArr.at(-1);
+        const dotArr = lastSlashElement.split('.');
+        const publicId = dotArr[0];
+
+        await cloudinary.uploader.destroy(publicId);
+
+
+
+    } catch (error) {
+        console.log(error)
+    }
 }
