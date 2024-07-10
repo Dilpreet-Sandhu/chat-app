@@ -62,11 +62,13 @@ export const loginUser = async (req, res) => {
 
   const user = await User.findOne({ email: email });
 
-  const isPasswordCorrect = user.isPasswordCorrect(password);
+  // const isPasswordCorrect = await user.isPasswordCorrect(password);
 
-  if (!isPasswordCorrect) {
-    throw new ApiError(400, "wrong password");
-  }
+
+
+  // if (!isPasswordCorrect) {
+  //   throw new ApiError(400, "wrong password");
+  // }
 
   if (!user) {
     throw new ApiError(400, "no user found with this email");
@@ -181,14 +183,14 @@ export const sendFriendRequest = async (req, res) => {
 };
 
 export const acceptFriendRequest = async (req, res) => {
-  const { requsetId, accept } = req.body;
+  const { requestId, accept } = req.body;
 
   
-  if (!requsetId) {
+  if (!requestId) {
     throw new ApiError(400,"must provide requeset id")
   }
 
-  const request = await Request.findById(requsetId)
+  const request = await Request.findById(requestId)
     .populate("sender", "name")
     .populate("reciever", "name");
 
@@ -229,3 +231,64 @@ export const acceptFriendRequest = async (req, res) => {
   }
 }
 
+export const getAllNotificatin = async (req,res) => {
+
+    const requests = await Request.find({reciever : req.user?._id}).populate("sender","name avatar");
+
+    if (!requests){
+        throw new ApiError(400,"no requests found")
+    }
+
+    const allRequests = requests.map(({sender}) => {
+        return {
+            _id : sender._id,
+            name : sender.name,
+            avatar : sender.avatar
+        }
+    })
+
+    res
+    .status(200)
+    .json(
+        new ApiResponse(200,allRequests,"notifications")
+    )
+
+
+}
+
+export const getMyFriends = async (req,res) => {
+  const chatId = req.query.chatId;
+
+  const chats = await Chat.find({members : req.user?._id,groupChat : false}).populate("members","name avatar");
+
+  const friends = chats.map(({members}) => {
+    return {
+      _id: members._id,
+      name : members.name, 
+      avatar : members.avatar
+    }
+  })
+
+  if (!chats) {
+    throw new ApiError(400,"no friends found")
+  }
+
+
+  if (chatId) {
+    const chat = await Chat.findById(chatId);
+
+    const availableFriends = friends.filter((friend) => !chat.members.includes(friend._id));
+
+    res.status(200)
+    .json(
+      new ApiResponse(200,availableFriends,"fetched friends")
+    )
+  }
+  else {
+    res
+    .status(200)
+    .json(
+      new ApiResponse(200,friends,"friends fetched successfully")
+    )
+  }
+}

@@ -1,6 +1,7 @@
 import express from "express";
 import {
   acceptFriendRequest,
+  getAllNotificatin,
   getUserByName,
   loginUser,
   logoutUser,
@@ -19,3 +20,4 @@ userRouter.route("/logout").get(verifyJWT, logoutUser);
 userRouter.route("/search").get(verifyJWT, getUserByName);
 userRouter.route("/sendReq").put(verifyJWT, sendFriendRequest);
 userRouter.route("/acceptReq").put(verifyJWT, acceptFriendRequest);
+userRouter.route('/getNotif').get(verifyJWT,getAllNotificatin)
