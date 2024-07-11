@@ -5,5 +5,5 @@ export const getOtherMember = (members,userId) => {
 }
 
 export const getSocket = (users) => {
-    return users.map((user) => userSocketIDs.get(user._id.toString()))
+    return users.map((user) => userSocketIDs.get(user.toString()))
 }

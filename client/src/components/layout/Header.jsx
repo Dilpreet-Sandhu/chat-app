@@ -15,25 +15,36 @@ import {
   Search,
   Notifications,
 } from "@mui/icons-material";
+import axios from "axios";
+axios.defaults.withCredentials = true;
 import React, { Suspense, lazy, useState } from "react";
 import { useNavigate } from "react-router-dom";
-const SearchDialogue = lazy(() => import('../specific/search'));
-const NotificationDialogue = lazy(() => import('../specific/notification'));
-const NewGroupDialogue = lazy(() => import('../specific/newGroup'));
+import { server } from "../auth/config";
+import { toast } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { userNotExists } from "../../redux/reducers/auth";
+import { setIsMobile, setIsSearch } from "../../redux/reducers/misc";
+
+
+const SearchDialogue = lazy(() => import("../specific/search"));
+const NotificationDialogue = lazy(() => import("../specific/notification"));
+const NewGroupDialogue = lazy(() => import("../specific/newGroup"));
 
 function Header() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [isMobile, setIsMobile] = useState(false);
-  const [isSearch, setIsSearch] = useState(false);
+  const {isSearch} = useSelector(state => state.misc);
+
+
   const [isNewGroup, setIsNewGroup] = useState(false);
   const [isNotification, setIsNotification] = useState(false);
 
   const handleMobile = () => {
-    setIsMobile((prev) => !prev);
+    dispatch(setIsMobile(true));
   };
   const openSearchDialogue = () => {
-    setIsSearch((prev) => !prev);
+    dispatch(setIsSearch(true))
   };
   const openNewGroup = () => {
     setIsNewGroup((prev) => !prev);
@@ -43,7 +54,17 @@ function Header() {
   };
   const manageGroups = () => navigate("/group");
 
-  const handleLogout = () => {};
+  const handleLogout = () => {
+    axios
+      .get(`${server}/users/logout`, { withCredentials: true })
+      .then((res) => {
+        dispatch(userNotExists());
+        navigate('/login')
+      })
+      .catch((err) => toast.error('couldn"t log out the user'));
+
+    toast.success("user logged out sucessfully");
+  };
 
   return (
     <>
@@ -53,8 +74,7 @@ function Header() {
           <Typography
             variant="h6"
             color={"white"}
-            sx={{ display: { xs: "none", sm: "block" } ,cursor:"pointer"}} 
-
+            sx={{ display: { xs: "none", sm: "block" }, cursor: "pointer" }}
           >
             Chat app
           </Typography>
@@ -96,27 +116,21 @@ function Header() {
           </Box>
         </Toolbar>
       </Box>
-      {
-        isSearch && (
-          <Suspense fallback={<Backdrop open/>}>
-            <SearchDialogue/>
-          </Suspense>
-        )
-      }
-      {
-        isNotification && (
-          <Suspense fallback={<Backdrop open/>}>
-            <NotificationDialogue/>
-          </Suspense>
-        )
-      }
-      {
-        isNewGroup && (
-          <Suspense fallback={<Backdrop open/>}>
-            <NewGroupDialogue/>
-          </Suspense>
-        )
-      }
+      {isSearch && (
+        <Suspense fallback={<Backdrop open />}>
+          <SearchDialogue />
+        </Suspense>
+      )}
+      {isNotification && (
+        <Suspense fallback={<Backdrop open />}>
+          <NotificationDialogue />
+        </Suspense>
+      )}
+      {isNewGroup && (
+        <Suspense fallback={<Backdrop open />}>
+          <NewGroupDialogue />
+        </Suspense>
+      )}
     </>
   );
 }

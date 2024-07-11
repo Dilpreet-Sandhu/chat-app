@@ -2,6 +2,7 @@ import express from "express";
 import {
   acceptFriendRequest,
   getAllNotificatin,
+  getMyDetails,
   getUserByName,
   loginUser,
   logoutUser,
@@ -16,6 +17,7 @@ export const userRouter = express();
 
 userRouter.route("/reg").post(upload.single("avatar"), registerUser);
 userRouter.route("/login").post(loginUser);
+userRouter.route('/getmyprofile').get(verifyJWT,getMyDetails)
 userRouter.route("/logout").get(verifyJWT, logoutUser);
 userRouter.route("/search").get(verifyJWT, getUserByName);
 userRouter.route("/sendReq").put(verifyJWT, sendFriendRequest);

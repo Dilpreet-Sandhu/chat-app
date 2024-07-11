@@ -82,10 +82,30 @@ export const loginUser = async (req, res) => {
 
   return res
     .status(200)
-    .cookie("accessToken", accessToken)
-    .cookie("refreshToken", refreshToken)
-    .json(new ApiResponse(200, newUser, "user logged in successfully"));
+    .cookie("accessToken", accessToken,{httpOnly:true,sameSite:"Lax",secure:false})
+    .cookie("refreshToken", refreshToken,{httpOnly:true,sameSite:"Lax",secure:false})
+    .json(new ApiResponse(200, {}, "user logged in successfully"));
 };
+
+export const getMyDetails = async (req,res) => {
+    const id = req.user?._id;
+
+
+    const user = await User.findById(id).select("-password -refreshToken");
+
+
+  if (!user) {
+    throw new ApiError(400,"can't find user")
+  }
+
+  res
+  .status(200)
+  .json(
+    new ApiResponse(200,user,"user fetched successfully")
+  )
+
+}
+
 
 export const logoutUser = async (req, res) => {
   const user = await User.findByIdAndUpdate(
@@ -115,13 +135,20 @@ export const getUserByName = async (req, res) => {
   const { name } = req.query;
   const user = req.user;
 
-  if (!name) throw new ApiError(400, "no name detected");
+  if (!name) {
+    const allUsers = await User.find();
+    res.status(200)
+    .json(
+      new ApiResponse(200,allUsers,"all users fetched")
+    )
+  }
 
   const chats = await Chat.find({ groupChat: false, members: user?._id });
 
   if (!chats) {
     throw new ApiError(400, "no chats found ");
   }
+  
 
   const allUsersFromTheChat = chats.flatMap((chat) => chat.members);
 

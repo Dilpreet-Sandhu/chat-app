@@ -13,11 +13,12 @@ export const app = express();
 export const server = createServer(app)
 export const io = new Server(server,{
     cors : {
-        origin : 'http://localhost:3000'
+        origin : 'http://localhost:3000',
     }
 })
 app.use(cors({
-    origin : process.env.FRONTEND_URL
+    origin : process.env.FRONTEND_URL,
+    credentials : true,
 }))
 app.use(express.json({limit : '17kb'}))
 app.use(express.urlencoded());
@@ -34,7 +35,7 @@ app.get('/',(req,res) => {
 //routes imports 
 import {userRouter} from './routes/user.routes.js';
 import { chatRouter } from './routes/chat.routes.js';
-import { NEW_MESSAGE } from './constants/constants.js';
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from './constants/constants.js';
 import { v4 } from 'uuid';
 import { getSocket } from './utils/helper.js';
 
@@ -51,6 +52,8 @@ io.on("connection",(socket) => {
 
     userSocketIDs.set(user._id.toString(),socket.id);
 
+    console.log(userSocketIDs)
+
     
     
     
@@ -61,7 +64,7 @@ io.on("connection",(socket) => {
             _id :v4(),
             sender : {
                 _id: user?._id,
-                name:user.name
+                name:user.name,
             },
             chat:chatId,
             createdAt : new Date().toISOString()
@@ -72,7 +75,13 @@ io.on("connection",(socket) => {
             sender : user?._id,
             chat:chatId
         }
-        const userSockets = getSocket(user);
+        const userSockets = getSocket(members);
+
+        io.to(userSockets).emit(NEW_MESSAGE,{
+            chatId,
+            message: messageForRealTime
+        })
+        io.to(userSockets).emit(NEW_MESSAGE_ALERT,{chatId})
         
         console.log(messageForRealTime)
         

@@ -1,3 +1,5 @@
+import { useFileHandler, useInputValidation } from "6pp";
+import { CameraAlt } from "@mui/icons-material";
 import {
   Avatar,
   Button,
@@ -8,9 +10,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import axios from "axios";
+axios.defaults.withCredentials = true;
 import React, { useState } from "react";
-import { CameraAlt } from "@mui/icons-material";
-import { useFileHandler, useInputValidation, useStrongPassword } from "6pp";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { server } from "../components/auth/config";
+import { userExists, userNotExists } from "../redux/reducers/auth";
 import { usernameValidator } from "../utils/usernameValidator";
 
 function Login() {
@@ -23,17 +29,64 @@ function Login() {
   const avatar = useFileHandler("single");
 
   const toggleLogin = () => setIsLoggingIn((prev) => !prev);
+  const handleRegister = async (e) => {
+    e.preventDefault();
 
-  const handleRegister = (e) => {
-    e.preventDefault()
-  }
+    const formData = new FormData();
+    formData.append("avatar", avatar.file);
+    formData.append("name", username.value);
+    formData.append("email", email.value);
+    formData.append("password", password.value);
+    formData.append("bio", bio.value);
 
-  const handleLogin = (e) => {
-    e.preventDefault()
-  }
+    try {
+
+      axios.postForm(`${server}/users/reg`,formData,{withCredentials:true,headers:{"Content-Type":"multipart/form-data"}}).then((res)=> {
+        console.log(res)
+        setIsLoggingIn(true)
+      }).catch((err) => console.log(err))
+
+      toast.success('user created succesfully')
+      
+      
+    } catch (error) {
+      console.log(error)
+    }
+    
+  };
+
+  const dispatch = useDispatch();
+
+  const handleLogin = async (e) => {
+    const config = {
+      withCredentials: true,
+     
+    };
+    e.preventDefault();
+
+    axios
+      .post(`${server}/users/login`, {
+        email: email.value,
+        password: password.value,
+      },config)
+      .then((data) => {
+        dispatch(userExists(true));
+        email.value = "";
+        password.value = "";
+        
+      
+        
+      })
+      .catch((err) => dispatch(userNotExists()));
+    toast.success('user logged in successfully');
+  };
 
   return (
-    <div style={{background : "linear-gradient(rgb(225,225,209),rgb(255,159,158))"}}>
+    <div
+      style={{
+        background: "linear-gradient(rgb(225,225,209),rgb(255,159,158))",
+      }}
+    >
       <Container
         component={"main"}
         maxWidth="xs"
@@ -56,16 +109,17 @@ function Login() {
           {isLoggingIn ? (
             <>
               <Typography variant="h5">Login</Typography>
-              <form onSubmit={handleLogin} style={{ width: "100%", marginTop: "1rem" }}>
+              <form style={{ width: "100%", marginTop: "1rem" }}>
                 <TextField
                   required
                   fullWidth
-                  label="Username"
+                  label="email"
                   variant="outlined"
-                  placeholder="enter useranme"
+                  placeholder="enter email"
+                  type="email"
                   sx={{ marginBottom: "0.5rem" }}
-                  value={username.value}
-                  onChange={username.changeHandler}
+                  value={email.value}
+                  onChange={email.changeHandler}
                 />
                 {username.error ? (
                   <Typography color="error" variant="caption">
@@ -82,12 +136,14 @@ function Login() {
                   value={password.value}
                   onChange={password.changeHandler}
                 />
-                
+
                 <Button
                   sx={{ marginTop: "1rem" }}
                   variant="contained"
                   color="primary"
                   fullWidth
+                  type="submit"
+                  onClick={handleLogin}
                 >
                   Login
                 </Button>
@@ -109,7 +165,7 @@ function Login() {
           ) : (
             <>
               <Typography variant="h5">Login</Typography>
-              <form onSubmit={handleRegister} style={{ width: "100%", marginTop: "1rem" }}>
+              <form style={{ width: "100%", marginTop: "1rem" }}>
                 <Stack
                   position={"relative"}
                   width="10rem"
@@ -124,11 +180,11 @@ function Login() {
                     }}
                     src={avatar.preview}
                   />
-                   {avatar.error ? (
-                  <Typography color="error" variant="caption">
-                    {avatar.error}
-                  </Typography>
-                ) : null}
+                  {avatar.error ? (
+                    <Typography color="error" variant="caption">
+                      {avatar.error}
+                    </Typography>
+                  ) : null}
                   <IconButton
                     sx={{
                       position: "absolute",
@@ -149,9 +205,7 @@ function Login() {
                         padding: 0,
                         whiteSpace: "nowrap",
                         width: 1,
-                        
                       }}
-
                       onChange={avatar.changeHandler}
                     />
                   </IconButton>
@@ -167,7 +221,7 @@ function Login() {
                   value={username.value}
                   onChange={username.changeHandler}
                 />
-                 {username.error ? (
+                {username.error ? (
                   <Typography color="error" variant="caption">
                     {username.error}
                   </Typography>
@@ -207,8 +261,9 @@ function Login() {
                   variant="contained"
                   color="primary"
                   fullWidth
+                  onClick={handleRegister}
                 >
-                  Login
+                  Register
                 </Button>
 
                 <Typography textAlign={"center"} m="1rem">

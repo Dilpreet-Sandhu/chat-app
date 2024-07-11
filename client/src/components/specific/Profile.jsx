@@ -1,9 +1,12 @@
-import { AlternateEmail, CalendarMonth, Face } from '@mui/icons-material'
+import { AlternateEmail, CalendarMonth, Face, SportsTennis } from '@mui/icons-material'
 import { Avatar, Stack, Typography } from '@mui/material'
 import React from 'react';
 import moment from 'moment';
+import { useSelector } from 'react-redux';
 
 const Profile = () => {
+  const {user} = useSelector(state => state.auth);
+  const joinedDate = moment(user.createdAt).fromNow();
   return (
     <Stack spacing={"2rem"} direction="column" alignItems="center">
         <Avatar 
@@ -15,10 +18,10 @@ const Profile = () => {
                 border:"5px solid white"
             }}
         />
-      <ProfileCard text={"bio"} heading={"my name is baba singh sandhu"}/>
-      <ProfileCard text={"baba@gmail.com"} icon={<AlternateEmail/>} heading={"email"}/>
-      <ProfileCard text={"baba sandhu"} icon={<Face/>} heading={"name"}/>
-      <ProfileCard text={'3 months ago'} icon={<CalendarMonth/>} heading={"joined"}/>
+      <ProfileCard text={user.bio} heading={"bio"}/>
+      <ProfileCard text={user.email} icon={<AlternateEmail/>} heading={"email"}/>
+      <ProfileCard text={user.name} icon={<Face/>} heading={"name"}/>
+      <ProfileCard text={joinedDate} icon={<CalendarMonth/>} heading={"joined"}/>
     </Stack>
   )
 }
