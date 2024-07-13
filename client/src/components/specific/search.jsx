@@ -6,7 +6,8 @@ import UserItem from './UserItem';
 import chats from '../shared/sample';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsSearch } from '../../redux/reducers/misc';
-import { useLazySearchUsersQuery } from '../../redux/api/api';
+import { useLazySearchUsersQuery, useSendFriendRequestMutation } from '../../redux/api/api';
+import toast from 'react-hot-toast';
 
 function SearchDialogue() {
 
@@ -14,10 +15,24 @@ function SearchDialogue() {
   const dispatch = useDispatch();
 
   const search = useInputValidation('');
-  const [users,setUsers] = useState(chats);
+  const [users,setUsers] = useState([]);
   const [searchUser] = useLazySearchUsersQuery();
 
-  const addFriendHandler = () => console.log('add friend');
+  const [sendFriendRequest] = useSendFriendRequestMutation();
+
+  const addFriendHandler = async (id) => {
+    console.log(id);
+    if (id) {
+      const res = await sendFriendRequest({userId : id});
+      console.log(res);
+      if (res.data) {
+        toast.success("request sent sucessfully")
+      }
+      else {
+        toast.error("couldn't send reqeuset")
+      }
+    }
+  };
 
   const closeHandler = () => dispatch(setIsSearch(false))
 

@@ -5,7 +5,7 @@ import { server } from '../../components/auth/config';
 const api = createApi({
     reducerPath : 'api',
     baseQuery : fetchBaseQuery({baseUrl : `${server}`}),
-    tagTypes : ["Chat","Search"],
+    tagTypes : ["Chat","User"],
     endpoints : (builder) => {
         return {
             myChats : builder.query({
@@ -20,8 +20,26 @@ const api = createApi({
                     url : `users/search?name=${name}`,
                     credentials : "include"
                 }),
-                providesTags:["Search"]
+                providesTags:["User"]
 
+            }),
+            sendFriendRequest : builder.mutation({
+                query : (data) => ({
+                    url : 'users/sendReq',
+                    credentials:"include",
+                    method : "PUT",
+                    body : data
+                }),
+                invalidatesTags:["User"]
+            }),
+            newGroup : builder.mutation({
+                query : (data) => ({
+                    url : "chats/new",
+                    credentials : "include",
+                    method : "POST",
+                    body : data,
+                    
+                })
             })
         }
     }
@@ -29,4 +47,4 @@ const api = createApi({
 
 
 export default api;
-export const {useMyChatsQuery,useLazySearchUsersQuery} = api;
+export const {useMyChatsQuery,useLazySearchUsersQuery,useSendFriendRequestMutation} = api;

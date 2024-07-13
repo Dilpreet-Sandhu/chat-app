@@ -20,7 +20,7 @@ const AppLayout = () => (Component) => {
     const {isMobile} = useSelector(state => state.misc);
 
     const { isLoading, isError, data, error, refetch } = useMyChatsQuery("");
-    console.log("data");
+   
 
     useEffect(() => {
       if (isError) {

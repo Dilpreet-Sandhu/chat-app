@@ -7,7 +7,7 @@ const UserItem = ({user,handler,handlerIsLoading,isAdded,styling}) => {
 
 
     const {name,avatar,_id} = user;
-    console.log(isAdded)
+    
 
   return (
     <ListItem>

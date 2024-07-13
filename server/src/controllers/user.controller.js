@@ -11,14 +11,14 @@ export const registerUser = async (req, res) => {
     const { name, email, password, bio } = req.body;
 
     if ([name, email, password].some((item) => item == "")) {
-      throw new ApiError(400, "name, email and password are required");
+     return res.json(new ApiError(400, "name, email and password are required"));
     }
     const avatarPath = req.file.path;
 
     const avatar = await uploadToCloudinary(avatarPath);
 
     if (!avatar) {
-      throw new ApiError(400, "couldn't upload to cloudinary");
+      return  res.json(new ApiError(400, "couldn't upload to cloudinary"));
     }
 
     const user = await User.create({
@@ -30,7 +30,7 @@ export const registerUser = async (req, res) => {
     });
 
     if (!user) {
-      throw new ApiError(400, "couldn't generate user");
+      return res.json(new ApiError(400, "couldn't generate user")) ;
     }
 
     res
@@ -41,13 +41,14 @@ export const registerUser = async (req, res) => {
   }
 };
 
-const generateTokens = async (id) => {
+const generateTokens = async (res,id) => {
   const user = await User.findById(id);
   const accessToken = user.generateAccessToken();
   const refreshToken = user.generateRefreshToken();
+  
 
   if (!accessToken || !refreshToken) {
-    throw new ApiError(400, "couldn't generate access or refresh token");
+    return res.json(new ApiError(400,"couldn't generate access or refesh token"))
   }
 
   return { accessToken, refreshToken };
@@ -57,24 +58,24 @@ export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email && !password) {
-    throw new ApiError(400, "email and password are required");
+    res.json(new ApiError(400, "email and password are required"));
   }
 
   const user = await User.findOne({ email: email });
 
-  // const isPasswordCorrect = await user.isPasswordCorrect(password);
+  const isPasswordCorrect = await user.isPasswordCorrect(password);
 
 
 
-  // if (!isPasswordCorrect) {
-  //   throw new ApiError(400, "wrong password");
-  // }
-
-  if (!user) {
-    throw new ApiError(400, "no user found with this email");
+  if (!isPasswordCorrect) {
+    return res.json(new ApiError(400, "wrong password")) ;
   }
 
-  const { accessToken, refreshToken } = await generateTokens(user._id);
+  if (!user) {
+   return res.json(new ApiError(res,400, "no user found with this email"));
+  }
+
+  const { accessToken, refreshToken } = await generateTokens(res,user._id);
 
   const newUser = await User.findById(user._id).select("-password");
   newUser.refreshToken = refreshToken;
@@ -95,10 +96,10 @@ export const getMyDetails = async (req,res) => {
 
 
   if (!user) {
-    throw new ApiError(400,"can't find user")
+    res.json(new ApiError(400,"can't find user"))
   }
 
-  res
+  return res
   .status(200)
   .json(
     new ApiResponse(200,user,"user fetched successfully")
@@ -121,10 +122,10 @@ export const logoutUser = async (req, res) => {
   );
 
   if (!user) {
-    throw new ApiError(401, "you are not logged in");
+    res.json(new ApiError(401, "you are not logged in"));
   }
 
-  res
+ return res
     .status(200)
     .clearCookie("accessToken", cookieOptions)
     .clearCookie("refreshToken", cookieOptions)
@@ -137,7 +138,7 @@ export const getUserByName = async (req, res) => {
 
   if (!name) {
     const allUsers = await User.find();
-    res.status(200)
+    return res
     .json(
       new ApiResponse(200,allUsers,"all users fetched")
     )
@@ -146,7 +147,7 @@ export const getUserByName = async (req, res) => {
   const chats = await Chat.find({ groupChat: false, members: user?._id });
 
   if (!chats) {
-    throw new ApiError(400, "no chats found ");
+    return res.json(new ApiError(400, "no chats found "));
   }
   
 
@@ -161,7 +162,7 @@ export const getUserByName = async (req, res) => {
     return { _id, name, avatar };
   });
 
-  res
+  return res
     .status(200)
     .json(new ApiResponse(200, users, "fetched user successfully"));
 };
@@ -170,8 +171,8 @@ export const sendFriendRequest = async (req, res) => {
   const { userId } = req.body;
   const myId = req.user?._id;
 
-  if (!userId && !myId) {
-    throw new ApiError(400, "user id must be specified");
+  if (!userId || !myId) {
+     return res.json(new ApiError(400, "user id must be specified"));
   }
   const request = await Request.findOne({
     $or: [
@@ -181,7 +182,7 @@ export const sendFriendRequest = async (req, res) => {
   });
 
   if (request) {
-    throw new ApiError(400, "request already sent");
+    return res.json(new ApiError(400, "request already sent"));
   }
 
   const chats = await Chat.find({
@@ -189,7 +190,7 @@ export const sendFriendRequest = async (req, res) => {
   });
 
   if (!chats) {
-    throw new ApiError(400, "you both are already friends");
+     return res.json(new ApiError(400, "you both are already friends"));
   }
 
   const newFriendRequest = await Request.create({
@@ -199,12 +200,12 @@ export const sendFriendRequest = async (req, res) => {
   });
 
   if (!newFriendRequest) {
-    throw new ApiError(404, "couldn't send friend request");
+    return res.json(new ApiError(404, "couldn't send friend request"));
   }
 
   emitEvent(req, NEW_REQUEST, [userId], `request sent`);
 
-  res
+  return res
     .status(200)
     .json(new ApiResponse(200, newFriendRequest, "friend request sent"));
 };
@@ -214,7 +215,7 @@ export const acceptFriendRequest = async (req, res) => {
 
   
   if (!requestId) {
-    throw new ApiError(400,"must provide requeset id")
+   return res.json(new ApiError(400,"must provide requeset id"))
   }
 
   const request = await Request.findById(requestId)
@@ -222,11 +223,11 @@ export const acceptFriendRequest = async (req, res) => {
     .populate("reciever", "name");
 
   if (!request) {
-    throw new ApiError(400, "request not found");
+    return res.json(new ApiError(400, "request not found"));
   }
 
   if (request.reciever._id.toString() !== req.user?._id.toString()) {
-    throw new ApiError(400, "you are not authorized to accept the request");
+    return res.stauts(400).json(new ApiError(400, "you are not authorized to accept the request"));
   }
   const members = [request.reciever._id, request.sender._id];
 
@@ -241,7 +242,7 @@ export const acceptFriendRequest = async (req, res) => {
 
     emitEvent(req,REFETCH_CHATS,members,``)
 
-    res.
+    return res.
     status(200)
     .json(
         new ApiResponse(200,chat,"friend request accepted")
@@ -249,7 +250,7 @@ export const acceptFriendRequest = async (req, res) => {
   }else {
     await request.deleteOne();
 
-    res
+    return res
     .status(200)
     .json(
         new ApiResponse(200,{},"friend request rejected")
@@ -263,7 +264,7 @@ export const getAllNotificatin = async (req,res) => {
     const requests = await Request.find({reciever : req.user?._id}).populate("sender","name avatar");
 
     if (!requests){
-        throw new ApiError(400,"no requests found")
+       return res.json(new ApiError(400,"no requests found"))
     }
 
     const allRequests = requests.map(({sender}) => {
@@ -274,7 +275,7 @@ export const getAllNotificatin = async (req,res) => {
         }
     })
 
-    res
+    return res
     .status(200)
     .json(
         new ApiResponse(200,allRequests,"notifications")
@@ -297,7 +298,7 @@ export const getMyFriends = async (req,res) => {
   })
 
   if (!chats) {
-    throw new ApiError(400,"no friends found")
+    return  res.json(new ApiError(400,"no friends found"))
   }
 
 
@@ -306,13 +307,13 @@ export const getMyFriends = async (req,res) => {
 
     const availableFriends = friends.filter((friend) => !chat.members.includes(friend._id));
 
-    res.status(200)
+   return  res.status(200)
     .json(
       new ApiResponse(200,availableFriends,"fetched friends")
     )
   }
   else {
-    res
+    return res
     .status(200)
     .json(
       new ApiResponse(200,friends,"friends fetched successfully")

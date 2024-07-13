@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,23 +12,40 @@ import {
 import chats from "../shared/sample.js";
 import UserItem from "./UserItem";
 import { useInputValidation } from "6pp";
+import { useLazySearchUsersQuery } from "../../redux/api/api.js";
+import { useDispatch, useSelector } from "react-redux";
+import { setNewGroup } from "../../redux/reducers/misc.js";
+
 
 const NewGroupDialogue = () => {
-  const [members, setMembers] = useState(chats);
+  const [searchUser] = useLazySearchUsersQuery();
+  const [members, setMembers] = useState([]);
   const [selectedMemebers, setSelectedMembers] = useState([]);
+  const {isNewGroup} = useSelector(state => state.misc);
+  const dispatch = useDispatch()
 
   const groupName = useInputValidation("");
-  const handleSubmit = () => {};
+
+  const handleSubmit = () => {
+      
+  };
   const selectMemeberHandler = (id) => {
     
     setSelectedMembers((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
-  console.log(selectedMemebers)
+  useEffect(() => {
+        searchUser("").then(({data}) => setMembers(data.data)).catch((err) => console.log(err));
+
+  },[]);
+
+  const handleCloseGroupBox = () => {
+      return dispatch(setNewGroup(false))
+  }
 
   return (
-    <Dialog open>
+    <Dialog open={isNewGroup} onClose={handleCloseGroupBox}>
       <Stack spacing={"2rem"} p={{ xs: "1rem", sm: "2rem" }} width={"25rem"}>
         <DialogTitle variant="h4">New Group</DialogTitle>
 
@@ -36,7 +53,7 @@ const NewGroupDialogue = () => {
 
         <Typography sx={{ marginBottom: "1rem" }}>Members</Typography>
 
-        {chats.map((user) => {
+        {members.map((user) => {
           return (
             <UserItem
               user={user}

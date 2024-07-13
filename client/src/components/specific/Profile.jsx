@@ -17,6 +17,7 @@ const Profile = () => {
                 marginBottom:"1rem",
                 border:"5px solid white"
             }}
+            src={user.avatar}
         />
       <ProfileCard text={user.bio} heading={"bio"}/>
       <ProfileCard text={user.email} icon={<AlternateEmail/>} heading={"email"}/>

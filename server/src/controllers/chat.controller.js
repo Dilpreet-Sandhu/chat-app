@@ -16,7 +16,7 @@ export const createGroupChat = async (req,res) => {
     const creatorId = req.user?._id;
 
     if (members.length < 3) {
-        throw new ApiError(400,"group chat must include at least 3 members")
+        return res.status(400).json(new ApiError(400,"group chat must include at least 3 members"))
     }
 
     const allMembers = [...members,creatorId];
@@ -29,7 +29,7 @@ export const createGroupChat = async (req,res) => {
     })
 
     if (!chat) {
-        throw new ApiError(400,"couldn't generate chat")
+        return res.status(400).json(new ApiError(400,"couldn't generate chat")) 
     }
 
     emitEvent(req,ALERT,allMembers,"welcome to baba's chat")
@@ -47,14 +47,14 @@ export const getMyAdminChats = async (req,res) => {
     const createrId = req.user._id;
 
     if (!createrId){
-        throw new ApiError(400,"creator id required")
+        return res.status(400).json(new ApiError(400,"creator id required"))
     }
 
     const chat = await Chat.find({creator : createrId}).populate('members',"name avatar");
 
 
     if (!chat) {
-        throw new ApiError(400,'invalid creator id')
+        return res.status(400).json(new ApiError(400,'invalid creator id')) 
     }
 
     const transformedChats = chat.map(({_id,name,members,groupChat}) => {
@@ -125,17 +125,17 @@ export const addMembers = async (req,res) => {
     const {chatId,members} = req.body;
     const adminId = req.user?._id;
 
-    if (!chatId && members) {
-        throw new ApiError(401,"chat id and members are required")
+    if (!chatId && !members) {
+        return res.status(400).json(new ApiError(401,"chat id and members are required"))
     }
     const chat = await Chat.findById(chatId);
 
     if (!chat.groupChat)  {
-        throw new ApiError(401,"this must be a group chat to add members")
+        return res.status(400).json(new ApiError(401,"this must be a group chat to add members"))
     }
 
     if (chat.creator.toString() !== adminId.toString()) {
-        throw new ApiError(401,"you must be admin to add or remove members")
+        return res.status(400).json(new ApiResponse(401,"you must be admin to add or remove members"))
     }
 
 
@@ -178,11 +178,11 @@ export const removeMembers = async (req,res) => {
     console.log(chat)
 
     if (!chat.groupChat)  {
-        throw new ApiError(401,"this must be a group chat to add members")
+        return res.status(400).json(new ApiError(401,"this must be a group chat to add members"))
     }
 
     if (chat.creator.toString() !== adminId.toString()) {
-        throw new ApiError(401,"you must be admin to add or remove members")
+        return res.stauts(400).json(new ApiError(401,"you must be admin to add or remove members"))
     }
 
     chat.members.filter((i) => i !== userToBeRemoved._id);
@@ -208,17 +208,17 @@ export const leaveMembers = async (req,res) => {
     const userId = req.user?._id;
 
     if (!chatId) {
-        throw new ApiError(401,"no chat id detected")
+        return res.stauts(400).json(new ApiError(401,"no chat id detected"))
     }
 
     const chat = await Chat.findById(chatId);
 
     if (!chat.groupChat) {
-        throw new ApiError(400,"this is not a group chat")
+        return res.stauts(400).json(new ApiError(400,"this is not a group chat"))
     }
 
     if (chat.members.length < 3) {
-        throw new ApiError(401,"group must have at least members")
+        return res.stauts(400).json(new ApiError(401,"group must have at least members"))
     }
 
 
@@ -257,16 +257,16 @@ export const sendAttachment = async (req,res) => {
     const filePath = req.files.photo[0].path;
 
     if (!chat) {
-        throw new ApiError(400,"no chat found")
+        return res.stauts(400).json(new ApiError(400,"no chat found"))
     }
     if (!filePath) {
-        throw new ApiError(400,"no filePath detected")
+        return res.stauts(400).json(new ApiError(400,"no filePath detected"))
     }
     
     const file = await uploadToCloudinary(filePath);
 
     if (!file) {
-        throw new ApiError(400,"couldn't upload to cloudinary")
+        return res.stauts(400).json(new ApiError(400,"couldn't upload to cloudinary"))
     }
 
     const messageForRealTime = {
@@ -311,7 +311,7 @@ export const getChatDetails = async (req,res) => {
         const chat = await Chat.findById(req.params?.id).populate("members","name avatar");
 
         if (!chat) {
-            throw new ApiError(400,"chat not found")
+            return res.stauts(400).json(new ApiError(400,"chat not found"))
         }
 
         res
@@ -326,7 +326,7 @@ export const getChatDetails = async (req,res) => {
         const chat = await Chat.findById(req.params?.id);
 
         if (!chat) {
-            throw new ApiError(400,"chat not found")
+            return res.stauts(400).json(new ApiError(400,"chat not found"))
         }
 
         res
@@ -343,13 +343,13 @@ export const renameGroup = async (req,res) => {
     const user = req.user?._id;
 
     if (!id) {
-        throw new ApiError(400,"no chat id found")
+        return res.stauts(400).json(new ApiError(400,"no chat id found"))
     }
 
     const Chat = await Chat.findById(id);
   
     if (!chat) {
-        throw new ApiError(400,"invalid chat id")
+        return res.stauts(400).json(new ApiError(400,"invalid chat id"))
     }
 
     const chat = await Chat.findByIdAndUpdate(id,{
@@ -372,7 +372,7 @@ export const deleteGroup = async (req,res) => {
     const {id} = req.params;
 
     if (!id) {
-        throw new ApiError(400,"no chat id detected")
+        return res.stauts(400).json(new ApiError(400,"no chat id detected"))
     }
     const newchat = await Chat.findById(id);
  
@@ -380,7 +380,7 @@ export const deleteGroup = async (req,res) => {
     const chat = await Chat.deleteOne({_id : id});
 
     if (!chat) {
-        throw new ApiError(400,"couldn't delete chat")
+        return res.stauts(400).json(new ApiError(400,"couldn't delete chat"))
     }
 
     const message = await Message.find({chat : id,attachments : {$exists : true,$ne :[]}});
@@ -393,8 +393,8 @@ export const deleteGroup = async (req,res) => {
 
     const delMessage = await Message.deleteMany({chat : id});
 
-    if (delMessage) {
-        throw new ApiError(400,'delted messages successfully')
+    if (!delMessage) {
+        return res.stauts(400).json(new ApiError(400,'couldn"t delte message'))
     }
 
 
