@@ -34,6 +34,7 @@ const AppLayout = () => (Component) => {
       console.log("delte chat");
 
     };
+    console.log(data)
 
     const handleMobile = () => dispatch(setIsMobile(false));
 
@@ -47,7 +48,7 @@ const AppLayout = () => (Component) => {
             <Drawer open={isMobile} onClose={handleMobile}>
                <ChatList
                w="40vw"
-              chats={data.chats }
+              chats={data.data }
               chatId={chatId}
               newMessageAlert={[{ chatId, count: "4" }]}
               handleDeleteChat={handleDeleteChat}
@@ -69,7 +70,7 @@ const AppLayout = () => (Component) => {
               <Skeleton/>
             ) : (
               <ChatList
-              chats={data.chats }
+              chats={data.data }
               chatId={chatId}
               newMessageAlert={[{ chatId, count: "4" }]}
               handleDeleteChat={handleDeleteChat}

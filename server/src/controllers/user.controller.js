@@ -267,8 +267,9 @@ export const getAllNotificatin = async (req,res) => {
        return res.json(new ApiError(400,"no requests found"))
     }
 
-    const allRequests = requests.map(({sender}) => {
+    const allRequests = requests.map(({_id,sender}) => {
         return {
+          requestId : _id,
             _id : sender._id,
             name : sender.name,
             avatar : sender.avatar

@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setIsSearch } from '../../redux/reducers/misc';
 import { useLazySearchUsersQuery, useSendFriendRequestMutation } from '../../redux/api/api';
 import toast from 'react-hot-toast';
+import useAsyncMutation from '../auth/hook';
 
 function SearchDialogue() {
 
@@ -18,20 +19,13 @@ function SearchDialogue() {
   const [users,setUsers] = useState([]);
   const [searchUser] = useLazySearchUsersQuery();
 
-  const [sendFriendRequest] = useSendFriendRequestMutation();
+  // const [sendFriendRequest] = useSendFriendRequestMutation();
+  const [loading,sendFriendRequeset,data] = useAsyncMutation(useSendFriendRequestMutation);
 
   const addFriendHandler = async (id) => {
     console.log(id);
-    if (id) {
-      const res = await sendFriendRequest({userId : id});
-      console.log(res);
-      if (res.data) {
-        toast.success("request sent sucessfully")
-      }
-      else {
-        toast.error("couldn't send reqeuset")
-      }
-    }
+    await sendFriendRequeset('loading data',{userId : id})
+    
   };
 
   const closeHandler = () => dispatch(setIsSearch(false))
