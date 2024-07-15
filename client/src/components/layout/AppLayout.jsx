@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 const AppLayout = () => (Component) => {
   return (props) => {
     const params = useParams();
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const { chatId } = params;
 
     const {isMobile} = useSelector(state => state.misc);
@@ -34,7 +34,7 @@ const AppLayout = () => (Component) => {
       console.log("delte chat");
 
     };
-    console.log(data)
+
 
     const handleMobile = () => dispatch(setIsMobile(false));
 
@@ -79,7 +79,7 @@ const AppLayout = () => (Component) => {
            }
           </Grid>
           <Grid item xs="12" sm="8" md="5" lg="6" height={"100%"}>
-            <Component {...props} />
+            <Component {...props} chatId={chatId}/>
           </Grid>
           <Grid
             item

@@ -29,3 +29,28 @@ export const verifyJWT = async (req,res,next) => {
         throw new ApiError(400,error)
     }
 }
+
+export const verifySocket = async (err,socket,next) => {
+    try {
+        const authToken = socket?.request?.cookies?.accessToken;
+
+
+        if (!authToken) {
+            throw new ApiError(400,"no access token found")
+        }
+        
+        const decodedToken =  jwt.verify(authToken,process.env.ACCESS_TOKEN_SECRET);
+
+        const user = await User.findById(decodedToken._id).select('-password -refreshToken')
+
+        if (!user) {
+            throw new ApiError(401,"no user found")
+        }
+
+        socket.user = user;
+
+        next();
+    } catch (error) {
+        console.log(error)
+    }
+}

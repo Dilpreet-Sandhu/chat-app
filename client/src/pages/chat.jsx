@@ -1,22 +1,41 @@
-import React, { Fragment, useRef } from "react";
+import React, { Fragment, useRef, useState } from "react";
 import AppLayout from "../components/layout/AppLayout";
-import { IconButton, Stack } from "@mui/material";
+import { IconButton, Skeleton, Stack } from "@mui/material";
 import { AttachFile, Send } from "@mui/icons-material";
 import FileMenu from "../components/dialog/FileMenu";
 import { messageData } from "../components/shared/sample";
 import MessageComponent from "../components/shared/MessageComponent";
+import { getSocket } from "../socket";
+import { NEW_MESSAGE } from "../utils/constants";
+import { useChatDetailsQuery } from "../redux/api/api";
 
 const user = {
   _id : "falkfw3320af",
   name : "baba"
 }
 
-function Chat() {
+function Chat({chatId}) {
   const containerRef = useRef();
 
+  const socket = getSocket();
 
+  const chatDetails = useChatDetailsQuery({chatId},{skip : !chatId});
 
-  return (
+ const members = chatDetails?.data?.data?.members;
+
+  const [message,setMessage] = useState("");
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    if (!message.trim()) return ;
+
+    socket.emit(NEW_MESSAGE,{chatId : chatId,members : members,message});
+    setMessage("");
+  }
+
+  
+
+  return ( chatDetails.isLoading ? <Skeleton/> :(
     <Fragment>
       <Stack
         ref={containerRef}
@@ -42,7 +61,7 @@ function Chat() {
           left:"1.5rem",
           rotate:"30deg"
         }}
-     
+    
         >
           <AttachFile/>
         </IconButton>
@@ -56,7 +75,7 @@ function Chat() {
           borderRadius:"1.5rem",
           backgroundColor:"rgba(0,0,0,0.1)"
 
-        }}/>
+        }} value={message} onChange={(e) => setMessage(e.target.value)}/>
 
         <IconButton type="submit" sx={{
           bgcolor:"#ea7070",
@@ -65,7 +84,7 @@ function Chat() {
           "&:hover" : {
             bgcolor : 'error.dark'
           }
-        }}>
+        }} onClick={submitHandler}>
           <Send/>
         </IconButton>
       </Stack>
@@ -73,7 +92,7 @@ function Chat() {
 
     <FileMenu />
 
-    </Fragment>
+    </Fragment>)
   );
 }
 

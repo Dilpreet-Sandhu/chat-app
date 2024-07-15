@@ -13,7 +13,9 @@ export const app = express();
 export const server = createServer(app)
 export const io = new Server(server,{
     cors : {
-        origin : 'http://localhost:3000',
+        origin : ['http://localhost:3000',"http://localhost:5173"],
+        credentials : true
+        
     }
 })
 app.use(cors({
@@ -38,23 +40,27 @@ import { chatRouter } from './routes/chat.routes.js';
 import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from './constants/constants.js';
 import { v4 } from 'uuid';
 import { getSocket } from './utils/helper.js';
+import { verifySocket } from './middlewares/auth.middleware.js';
+import { Message } from './models/message.model.js';
 
 app.use('/api/v1/users',userRouter)
 app.use('/api/v1/chats',chatRouter)
 
-
+io.use((socket,next) => {
+    cookieParser()(socket.request,socket.request.res,async (err) => {
+        return await verifySocket(err,socket,next)
+    })
+})
 
 io.on("connection",(socket) => {
 
-    console.log('a user connected' + socket.id);
+   
 
-    const user = {_id:"3wa32ay7sdkjlf",name : "baba"};
+    const user = socket.user;
 
     userSocketIDs.set(user._id.toString(),socket.id);
 
-    console.log(userSocketIDs)
-
-    
+  
     
     
     socket.on(NEW_MESSAGE,async({chatId,members,message}) => {
@@ -83,12 +89,11 @@ io.on("connection",(socket) => {
         })
         io.to(userSockets).emit(NEW_MESSAGE_ALERT,{chatId})
         
-        console.log(messageForRealTime)
+       const MessageForDatabase =  await Message.create(messageForDb);
         
     })
 
     socket.on("disconnect",() => {
-        console.log('a user disconnected')
         userSocketIDs.delete(user._id.toString())
     })
 })
