@@ -4,7 +4,7 @@ import { server } from "../../components/auth/config";
 const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: `${server}` }),
-  tagTypes: ["Chat", "User"],
+  tagTypes: ["Chat", "User","Message"],
   endpoints: (builder) => {
     return {
       myChats: builder.query({
@@ -68,6 +68,15 @@ const api = createApi({
         },
         providesTags: ["Chat"],
       }),
+      getMessages: builder.query({
+        query: ({ chatId, page }) => {
+          return {
+            url: `chats/messages/${chatId}?page=${page}`,
+            credentials: "include",
+          };
+        },
+        providesTags: ["Message"],
+      }),
     };
   },
 });
@@ -79,5 +88,6 @@ export const {
   useSendFriendRequestMutation,
   useNotificationQuery,
   useAcceptRequestMutation,
-  useChatDetailsQuery
+  useChatDetailsQuery,
+  useGetMessagesQuery
 } = api;

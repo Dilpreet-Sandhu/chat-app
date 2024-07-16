@@ -67,6 +67,7 @@ io.on("connection",(socket) => {
         
         const messageForRealTime = {
             content:message,
+            attachments: [],
             _id :v4(),
             sender : {
                 _id: user?._id,
@@ -75,6 +76,8 @@ io.on("connection",(socket) => {
             chat:chatId,
             createdAt : new Date().toISOString()
         }
+
+
 
         const messageForDb = {
             content: message,

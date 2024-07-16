@@ -15,6 +15,7 @@ const AppLayout = () => (Component) => {
   return (props) => {
     const params = useParams();
     const dispatch = useDispatch();
+    const {user} = useSelector(state => state.auth);
     const { chatId } = params;
 
     const {isMobile} = useSelector(state => state.misc);
@@ -79,7 +80,7 @@ const AppLayout = () => (Component) => {
            }
           </Grid>
           <Grid item xs="12" sm="8" md="5" lg="6" height={"100%"}>
-            <Component {...props} chatId={chatId}/>
+            <Component {...props} chatId={chatId} user={user}/>
           </Grid>
           <Grid
             item

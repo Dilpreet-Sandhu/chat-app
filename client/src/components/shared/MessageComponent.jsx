@@ -1,19 +1,21 @@
 import { Box, Typography } from '@mui/material';
 import moment from 'moment';
-import React from 'react'
+import React, { forwardRef } from 'react'
 import { fileFormat } from '../../lib/feautres';
 import ShowAttachment from './showAttachment';
 
-const MessageComponent = ({message,user}) => {
+const MessageComponent = forwardRef(({message,user},ref) => {
 
     const {sender,content,attachments,createdAt} = message;
-
+ 
     const sameSender = sender._id == user._id;
 
-    const timeAgo = moment(createdAt).fromNow()
+    const timeAgo = moment(createdAt).fromNow();
+  
+
 
   return (
-    <div style={{
+    <div ref={ref} style={{
         alignSelf : sameSender ? "flex-end" : "flex-start",
         background:"white",
         color:"black",
@@ -47,6 +49,6 @@ const MessageComponent = ({message,user}) => {
       
     </div>
   )
-}
+})
 
 export default MessageComponent

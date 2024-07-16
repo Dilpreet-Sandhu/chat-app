@@ -93,12 +93,12 @@ export const getMyChats = async (req,res) => {
     const chats = await Chat.find({members : userId}).populate("members","name avatar");
 
     if (!chats) {
-        throw new ApiError(400,'invlid user id')
+        throw new ApiError(400,'invalid user id')
     }
 
     const transformedChats = chats.map(({_id,name,members,groupChat}) => {
 
-        const otherMember = getOtherMember(members,req.user?._id)
+        const otherMember = getOtherMember(members,userId)
 
         return {
             _id,
@@ -113,6 +113,7 @@ export const getMyChats = async (req,res) => {
             avatar : groupChat ? members.slice(0,3).map(({avatar}) => avatar) : [otherMember.avatar]
         }
     })
+
 
     res.
     status(200)
