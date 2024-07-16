@@ -17,7 +17,8 @@ export const io = new Server(server,{
         credentials : true
         
     }
-})
+});
+app.set("io",io)
 app.use(cors({
     origin : process.env.FRONTEND_URL,
     credentials : true,

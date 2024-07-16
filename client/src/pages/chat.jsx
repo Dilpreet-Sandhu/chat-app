@@ -41,7 +41,7 @@ function Chat({ chatId, user }) {
 
   const oldMessagesChunk = useGetMessagesQuery({ chatId, page });
 
-  const { data: oldMessages, setMessage: setOldMessages } =
+  const { data: oldMessages,setData : setOldMessages } =
     useInfiniteScrollTop(
       containerRef,
       oldMessagesChunk?.data?.data?.totalPages,
@@ -62,7 +62,25 @@ function Chat({ chatId, user }) {
     socket.emit(NEW_MESSAGE, { chatId: chatId, members: members, message });
     setMessage("");
   };
+
+  useEffect(() => {
+    return () => {
+      setMessageArr([]);
+    setMessage("");
+    setOldMessages([]);
+    setPage(1);
+    }
+  },[chatId])
+
+
   const newMessageHandler = useCallback((data) => {
+
+    console.log(data)
+
+    if (data?.chatId !== chatId ) return;
+
+      console.log('anything')
+
     setMessageArr((prev) => [...prev, data?.message]);
   }, []);
 
@@ -70,7 +88,12 @@ function Chat({ chatId, user }) {
 
   useSocketEvents(socket, eventArr);
 
-  const allMessages = [...oldMessages, ...messageArr];
+
+
+  const oldMessegesReversed = oldMessages.reverse();
+
+  const allMessages = [...oldMessegesReversed, ...messageArr];
+
 
   useEffect(() => {
     if (lastMessageRef.current) {
@@ -153,7 +176,7 @@ function Chat({ chatId, user }) {
         </Stack>
       </form>
 
-      <FileMenu anchorEl={anchorEl}/>
+      <FileMenu chatId={chatId} anchorEl={anchorEl}/>
     </Fragment>
   );
 }

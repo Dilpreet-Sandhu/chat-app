@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import Header from "./Header";
 import Title from "../shared/title";
 import { Drawer, Grid, Skeleton } from "@mui/material";
@@ -10,11 +10,16 @@ import { useMyChatsQuery } from "../../redux/api/api.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsDeleteMenu, setIsMobile } from "../../redux/reducers/misc.js";
 import toast from "react-hot-toast";
+import { useSocketEvents } from "../auth/hook.jsx";
+import {getSocket} from '../../socket.jsx'
+import { NEW_MESSAGE, NEW_REQUEST } from "../../utils/constants.js";
+import { incrementCount } from "../../redux/reducers/chat.js";
 
 const AppLayout = () => (Component) => {
   return (props) => {
     const params = useParams();
     const dispatch = useDispatch();
+    const socket = getSocket();
     const {user} = useSelector(state => state.auth);
     const { chatId } = params;
 
@@ -38,6 +43,18 @@ const AppLayout = () => (Component) => {
 
 
     const handleMobile = () => dispatch(setIsMobile(false));
+
+    const newMessageHandler = useCallback(() => {
+      
+    },[]);
+    const newRequestHandler = useCallback(() => {
+        dispatch(incrementCount())
+    },[])
+
+    
+  const eventArr = { [NEW_MESSAGE]: newMessageHandler,[NEW_REQUEST]: newRequestHandler };
+
+  useSocketEvents(socket, eventArr);
 
     return (
       <div>

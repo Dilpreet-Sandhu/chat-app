@@ -23,8 +23,8 @@ function SearchDialogue() {
   const [loading,sendFriendRequeset,data] = useAsyncMutation(useSendFriendRequestMutation);
 
   const addFriendHandler = async (id) => {
-    console.log(id);
-    await sendFriendRequeset('loading data',{userId : id})
+
+    await sendFriendRequeset('sending friend requeset',{userId : id})
     
   };
 

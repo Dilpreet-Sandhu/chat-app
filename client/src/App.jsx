@@ -30,7 +30,7 @@ function App() {
   const dispatch = useDispatch();
 
   const socket = getSocket();
-  console.log(socket)
+  
 
   useEffect(() => {
     axios

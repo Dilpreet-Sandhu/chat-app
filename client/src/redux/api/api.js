@@ -77,6 +77,14 @@ const api = createApi({
         },
         providesTags: ["Message"],
       }),
+      sendAttachment : builder.mutation({
+        query : (data) => ({
+          url : `chats/send/attachment`,
+          credentials : 'include',
+          method : "POST",
+          body : data
+        })
+      })
     };
   },
 });
@@ -89,5 +97,6 @@ export const {
   useNotificationQuery,
   useAcceptRequestMutation,
   useChatDetailsQuery,
-  useGetMessagesQuery
+  useGetMessagesQuery,
+  useSendAttachmentMutation
 } = api;

@@ -1,11 +1,12 @@
 import {ApiError,ApiResponse} from '../utils/apiHanlder.js';
 import {Chat} from '../models/chat.model.js';
 import { emitEvent } from '../utils/features.js';
-import { ALERT, REFETCH_CHATS,NEW_ATTACHMENT,NEW_MESSAGE_ALERT } from '../constants/constants.js';
+import { ALERT, REFETCH_CHATS,NEW_ATTACHMENT,NEW_MESSAGE_ALERT, NEW_MESSAGE } from '../constants/constants.js';
 import { getOtherMember } from '../utils/helper.js';
 import {User} from '../models/user.model.js';
 import {Message} from '../models/message.model.js';
 import {deleteFromCloudinary, uploadToCloudinary} from '../utils/cloudinary.js'
+import { v4 } from 'uuid';
 
 
 
@@ -272,13 +273,15 @@ export const sendAttachment = async (req,res) => {
 
     const messageForRealTime = {
         content:"",
-        attachment : [{url : file.url}],
-        sender:{
-            name : user.name,
-            _id : user._id
+        attachments: {url : file.url},
+        _id :v4(),
+        sender : {
+            _id: user?._id,
+            name:user.name,
         },
-        chat : chat._id
-    };
+        chat:chatId,
+        createdAt : new Date().toISOString(),
+    }
     
     const messageForDb = {
         content:"",
@@ -290,12 +293,12 @@ export const sendAttachment = async (req,res) => {
     const message = await Message.create({
         content : "",
         attachments : [{url : file.url}],
-        sender : user._id,
+        sender : user?._id,
         chat : chat?._id
 
     })
 
-    emitEvent(req,NEW_ATTACHMENT,chat.members,messageForRealTime);
+    emitEvent(req,NEW_MESSAGE,chat.members,messageForRealTime);
     emitEvent(req,NEW_MESSAGE_ALERT,chat.members)
 
     res

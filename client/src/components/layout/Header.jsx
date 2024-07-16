@@ -1,6 +1,7 @@
 import {
   AppBar,
   Backdrop,
+  Badge,
   Box,
   IconButton,
   Toolbar,
@@ -35,6 +36,7 @@ function Header() {
   const dispatch = useDispatch();
 
   const {isSearch,isNewGroup,isNotification} = useSelector(state => state.misc);
+  const {notificationCount} = useSelector(state => state.chat);
   
 
   // const [isNotification, setIsNotification] = useState(false);
@@ -102,7 +104,7 @@ function Header() {
               handleClick={manageGroups}
               icon={<Group htmlColor="white" />}
             />
-            <IconBtn
+            <IconBtn value={notificationCount}
               title="Notification"
               handleClick={openNotification}
               icon={<Notifications htmlColor="white" />}
@@ -134,10 +136,14 @@ function Header() {
   );
 }
 
-const IconBtn = ({ title, handleClick, icon }) => {
+const IconBtn = ({ title, handleClick, icon, value }) => {
   return (
     <Tooltip title={title}>
-      <IconButton onClick={handleClick}>{icon}</IconButton>
+      <IconButton onClick={handleClick}>
+        {
+          value ? <Badge color={'error'} badgeContent={value}>{icon}</Badge> : icon
+        }
+      </IconButton>
     </Tooltip>
   );
 };
