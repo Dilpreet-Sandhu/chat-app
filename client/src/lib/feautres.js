@@ -11,4 +11,13 @@ const fileFormat = (url) => {
 
 }
 
+export const getOrSaveFromLocalStorage = ({get,value,key}) =>{
+    if (get) {
+        localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : null
+    }
+    else {
+        localStorage.setItem(key,JSON.stringify(value))
+    }
+}
+
 export {fileFormat}

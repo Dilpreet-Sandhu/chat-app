@@ -40,7 +40,7 @@ const ChatItem = ({
         <Typography  sx={{color: sameSender ? 'white' : "black",marginLeft: "3rem"}}>{name}</Typography>
         {
             newMessage && (
-                <Typography sx={{marginLeft:"3rem"}}>{newMessage.count} New messages</Typography>
+                <Typography sx={{marginLeft:"3rem",color: sameSender ? 'white' : "black"}}>{newMessage.count} New messages</Typography>
             )
         }
     </Stack>

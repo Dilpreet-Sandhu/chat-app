@@ -12,8 +12,9 @@ import { setIsDeleteMenu, setIsMobile } from "../../redux/reducers/misc.js";
 import toast from "react-hot-toast";
 import { useSocketEvents } from "../auth/hook.jsx";
 import {getSocket} from '../../socket.jsx'
-import { NEW_MESSAGE, NEW_REQUEST } from "../../utils/constants.js";
-import { incrementCount } from "../../redux/reducers/chat.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT, NEW_REQUEST } from "../../utils/constants.js";
+import { incrementCount, setNewMessageAlert } from "../../redux/reducers/chat.js";
+import { getOrSaveFromLocalStorage } from "../../lib/feautres.js";
 
 const AppLayout = () => (Component) => {
   return (props) => {
@@ -24,6 +25,7 @@ const AppLayout = () => (Component) => {
     const { chatId } = params;
 
     const {isMobile} = useSelector(state => state.misc);
+    const {newMessageAlert} = useSelector(state => state.chat)
 
     const { isLoading, isError, data, error, refetch } = useMyChatsQuery("");
    
@@ -35,6 +37,11 @@ const AppLayout = () => (Component) => {
     },[])
 
 
+    useEffect(() => {
+        getOrSaveFromLocalStorage({key : NEW_MESSAGE_ALERT,value : newMessageAlert})
+    },[newMessageAlert])
+
+
 
     const handleDeleteChat = (e, _id, groupChat) => {
       console.log("delte chat");
@@ -44,15 +51,17 @@ const AppLayout = () => (Component) => {
 
     const handleMobile = () => dispatch(setIsMobile(false));
 
-    const newMessageHandler = useCallback(() => {
-      
-    },[]);
+    const newMessageAlertHandler = useCallback((data) => {
+  
+      if (data?.chatId === chatId) return;
+        dispatch(setNewMessageAlert({chatId : data.chatId}))
+    },[chatId]);
     const newRequestHandler = useCallback(() => {
         dispatch(incrementCount())
     },[])
 
     
-  const eventArr = { [NEW_MESSAGE]: newMessageHandler,[NEW_REQUEST]: newRequestHandler };
+  const eventArr = { [NEW_MESSAGE_ALERT]: newMessageAlertHandler,[NEW_REQUEST]: newRequestHandler };
 
   useSocketEvents(socket, eventArr);
 
@@ -68,7 +77,7 @@ const AppLayout = () => (Component) => {
                w="40vw"
               chats={data.data }
               chatId={chatId}
-              newMessageAlert={[{ chatId, count: "4" }]}
+              newMessageAlert={newMessageAlert}
               handleDeleteChat={handleDeleteChat}
             />
             </Drawer>
@@ -90,7 +99,7 @@ const AppLayout = () => (Component) => {
               <ChatList
               chats={data.data }
               chatId={chatId}
-              newMessageAlert={[{ chatId, count: "4" }]}
+              newMessageAlert={newMessageAlert}
               handleDeleteChat={handleDeleteChat}
             />
             )

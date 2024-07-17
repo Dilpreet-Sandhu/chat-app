@@ -43,6 +43,7 @@ import { v4 } from 'uuid';
 import { getSocket } from './utils/helper.js';
 import { verifySocket } from './middlewares/auth.middleware.js';
 import { Message } from './models/message.model.js';
+import { START_TYPING } from '../../client/src/utils/constants.js';
 
 app.use('/api/v1/users',userRouter)
 app.use('/api/v1/chats',chatRouter)
@@ -91,10 +92,16 @@ io.on("connection",(socket) => {
             chatId,
             message: messageForRealTime
         })
-        io.to(userSockets).emit(NEW_MESSAGE_ALERT,{chatId})
+        io.to(userSockets).emit(NEW_MESSAGE_ALERT,{chatId});
         
        const MessageForDatabase =  await Message.create(messageForDb);
         
+    })
+
+    socket.on(START_TYPING,async ({members,chatId}) => {
+        const membersSockets = getSocket(members);
+
+        socket.to(membersSockets).emit(START_TYPING,{chatId})
     })
 
     socket.on("disconnect",() => {
