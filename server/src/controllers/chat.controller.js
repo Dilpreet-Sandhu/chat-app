@@ -51,7 +51,7 @@ export const getMyAdminChats = async (req,res) => {
         return res.status(400).json(new ApiError(400,"creator id required"))
     }
 
-    const chat = await Chat.find({creator : createrId}).populate('members',"name avatar");
+    const chat = await Chat.find({creator : createrId,groupChat:true,members:createrId}).populate('members',"name avatar");
 
 
     if (!chat) {
@@ -78,7 +78,7 @@ export const getMyAdminChats = async (req,res) => {
     res
     .status(200)
     .json(
-        new ApiResponse(200,transformedChats,"fetched my chats successfully")
+        new ApiResponse(200,transformedChats,"fetched my admin chats successfully")
     )
 
 }
@@ -141,13 +141,15 @@ export const addMembers = async (req,res) => {
     }
 
 
-    const allNewMembersPromise = members.map((i) => User.findById(i,"name"));
+    const allNewMembersPromise = members.map((i) => User.findById(i, "name"));
 
-    const allNewMembers = await Promise.all(allNewMembersPromise);
+  const allNewMembers = await Promise.all(allNewMembersPromise);
 
-    const uniqueMembers = allNewMembers.filter((member) => !chat.members.includes(member._id.toString())).map((i) => i._id)
+  const uniqueMembers = allNewMembers
+    .filter((i) => !chat.members.includes(i._id.toString()))
+    .map((i) => i._id);
 
-    chat.members.push(...uniqueMembers);
+  chat.members.push(...uniqueMembers);
 
     if (chat.members.length > 100) {
         throw new ApiError(401,"members length exceeds the limit")
@@ -177,7 +179,7 @@ export const removeMembers = async (req,res) => {
     const chat = await Chat.findById(chatId);
     const userToBeRemoved = await User.findById(userId);
 
-    console.log(chat)
+
 
     if (!chat.groupChat)  {
         return res.status(400).json(new ApiError(401,"this must be a group chat to add members"))
@@ -187,12 +189,14 @@ export const removeMembers = async (req,res) => {
         return res.stauts(400).json(new ApiError(401,"you must be admin to add or remove members"))
     }
 
-    chat.members.filter((i) => i !== userToBeRemoved._id);
+    const memberIds = chat.members.map((id) => id.toString());
 
+    chat.members = chat.members.filter((member) => member.toString() !== userId.toString());
     await chat.save({validateBeforeSave:false});
+  
 
     emitEvent(req,ALERT,chat.members,`${userToBeRemoved.name} is removed from the group`);
-    emitEvent(req,REFETCH_CHATS,chat.members)
+    emitEvent(req,REFETCH_CHATS,memberIds)
 
 
     res.
@@ -350,9 +354,9 @@ export const renameGroup = async (req,res) => {
         return res.stauts(400).json(new ApiError(400,"no chat id found"))
     }
 
-    const Chat = await Chat.findById(id);
+    const findChat = await Chat.findById(id);
   
-    if (!chat) {
+    if (!findChat) {
         return res.stauts(400).json(new ApiError(400,"invalid chat id"))
     }
 

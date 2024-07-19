@@ -129,7 +129,7 @@ function Header() {
       )}
       {isNewGroup && (
         <Suspense fallback={<Backdrop open />}>
-          <NewGroupDialogue />
+          <NewGroupDialogue/>
         </Suspense>
       )}
     </>

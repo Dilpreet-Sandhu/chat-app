@@ -7,7 +7,7 @@ const UserItem = ({user,handler,handlerIsLoading,isAdded,styling}) => {
 
 
     const {name,avatar,_id} = user;
-    
+
 
   return (
     <ListItem>
@@ -32,7 +32,7 @@ const UserItem = ({user,handler,handlerIsLoading,isAdded,styling}) => {
 
             <IconButton onClick={() => handler(_id)} disabled={handlerIsLoading}>
                 {
-                    isAdded ? <Remove htmlColor='red'/> : <Add htmlColor='green'/>
+                    isAdded ? <Remove sx={{bgcolor:"red",borderRadius:"50%"}}  htmlColor='white'/> : <Add sx={{bgcolor:'green',borderRadius:"50%"}}  htmlColor='white'/>
                 }
             </IconButton>
         </Stack>

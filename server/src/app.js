@@ -43,7 +43,7 @@ import { v4 } from 'uuid';
 import { getSocket } from './utils/helper.js';
 import { verifySocket } from './middlewares/auth.middleware.js';
 import { Message } from './models/message.model.js';
-import { START_TYPING } from '../../client/src/utils/constants.js';
+import { START_TYPING, STOP_TYPING } from '../../client/src/utils/constants.js';
 
 app.use('/api/v1/users',userRouter)
 app.use('/api/v1/chats',chatRouter)
@@ -102,6 +102,12 @@ io.on("connection",(socket) => {
         const membersSockets = getSocket(members);
 
         socket.to(membersSockets).emit(START_TYPING,{chatId})
+    })
+
+    socket.on(STOP_TYPING,async ({members,chatId}) => {
+        const membersSockets = getSocket(members)
+
+        socket.to(membersSockets).emit(STOP_TYPING,{members,chatId })
     })
 
     socket.on("disconnect",() => {

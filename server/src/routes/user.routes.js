@@ -3,6 +3,7 @@ import {
   acceptFriendRequest,
   getAllNotificatin,
   getMyDetails,
+  getMyFriends,
   getUserByName,
   loginUser,
   logoutUser,
@@ -23,3 +24,4 @@ userRouter.route("/search").get(verifyJWT, getUserByName);
 userRouter.route("/sendReq").put(verifyJWT, sendFriendRequest);
 userRouter.route("/acceptReq").put(verifyJWT, acceptFriendRequest);
 userRouter.route('/getNotif').get(verifyJWT,getAllNotificatin)
+userRouter.route('/getMyFriends').get(verifyJWT,getMyFriends)

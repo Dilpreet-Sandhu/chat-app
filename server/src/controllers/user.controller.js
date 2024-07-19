@@ -5,6 +5,7 @@ import { Chat } from "../models/chat.model.js";
 import { Request } from "../models/request.model.js";
 import { emitEvent } from "../utils/features.js";
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/constants.js";
+import { getOtherMember } from "../utils/helper.js";
 
 export const registerUser = async (req, res) => {
   try {
@@ -291,10 +292,11 @@ export const getMyFriends = async (req,res) => {
   const chats = await Chat.find({members : req.user?._id,groupChat : false}).populate("members","name avatar");
 
   const friends = chats.map(({members}) => {
+    const otherMembers = getOtherMember(members,req.user?._id);
     return {
-      _id: members._id,
-      name : members.name, 
-      avatar : members.avatar
+      _id: otherMembers._id,
+      name : otherMembers.name, 
+      avatar : otherMembers.avatar
     }
   })
 

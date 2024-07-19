@@ -1,6 +1,7 @@
-import { Skeleton } from "@mui/material";
+import { Box, Skeleton, Stack } from "@mui/material";
 import React from "react";
 import { Grid } from "@mui/material";
+import { BouncingSkeleton } from "../../styles/styles";
 
 const Loaders = () => {
   return (
@@ -33,5 +34,17 @@ const Loaders = () => {
     </div>
   );
 };
-
+export const TypingLoader = () => {
+  return <Stack
+  spacing={'0.5rem'}
+  direction={'row'}
+  padding="0.5rem"
+  justifyContent={'center'}
+  >
+    <BouncingSkeleton variant="circular" width={15}  height={15} style={{animationDelay:'0.1s'}}/>
+    <BouncingSkeleton variant="circular" width={15}  height={15} style={{animationDelay:'0.2s'}}/>
+    <BouncingSkeleton variant="circular" width={15}  height={15} style={{animationDelay:"0.3s"}}/>
+    <BouncingSkeleton variant="circular" width={15}  height={15} style={{animationDelay:"0.5s"}}/>
+  </Stack>
+}
 export default Loaders;
