@@ -21,6 +21,7 @@ import { usernameValidator } from "../utils/usernameValidator";
 
 function Login() {
   const [isLoggingIn, setIsLoggingIn] = useState(true);
+  const [isLoading,setIsLoading] = useState(false);
 
   const username = useInputValidation("", usernameValidator);
   const email = useInputValidation("");
@@ -32,6 +33,8 @@ function Login() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    const toastId = toast.loading('registering')
+
     const formData = new FormData();
     formData.append("avatar", avatar.file);
     formData.append("name", username.value);
@@ -40,17 +43,20 @@ function Login() {
     formData.append("bio", bio.value);
 
     try {
+      setIsLoading(true)
 
       axios.postForm(`${server}/users/reg`,formData,{withCredentials:true,headers:{"Content-Type":"multipart/form-data"}}).then((res)=> {
         console.log(res)
         setIsLoggingIn(true)
       }).catch((err) => console.log(err))
 
-      toast.success('user created succesfully')
+      toast.success('user created succesfully',{id:toastId})
       
       
     } catch (error) {
       console.log(error)
+    }finally{
+      setIsLoading(false)
     }
     
   };
@@ -64,21 +70,30 @@ function Login() {
     };
     e.preventDefault();
 
+    const toastId = toast.loading('logging in');
+
+    setIsLoading(true)
+
     axios
       .post(`${server}/users/login`, {
         email: email.value,
         password: password.value,
       },config)
       .then((data) => {
-        dispatch(userExists(true));
+        console.log(data?.data?.data)
+        dispatch(userExists(data.data?.data));
         email.value = "";
         password.value = "";
         
       
         
       })
-      .catch((err) => dispatch(userNotExists()));
-    toast.success('user logged in successfully');
+      .catch((err) => dispatch(userNotExists()))
+      .finally(() => {
+        setIsLoading(false)
+      })
+      ;
+    toast.success('user logged in successfully',{id:toastId});
   };
 
   return (
@@ -144,6 +159,7 @@ function Login() {
                   fullWidth
                   type="submit"
                   onClick={handleLogin}
+                  disabled={isLoading}
                 >
                   Login
                 </Button>
@@ -157,6 +173,7 @@ function Login() {
                   variant="text"
                   fullWidth
                   onClick={toggleLogin}
+                  disabled={isLoading}
                 >
                   Register
                 </Button>
@@ -262,6 +279,7 @@ function Login() {
                   color="primary"
                   fullWidth
                   onClick={handleRegister}
+                  disabled={isLoading}
                 >
                   Register
                 </Button>
@@ -275,6 +293,7 @@ function Login() {
                   variant="text"
                   fullWidth
                   onClick={toggleLogin}
+                  disabled={isLoading}
                 >
                   Login
                 </Button>

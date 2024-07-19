@@ -1,12 +1,12 @@
-import {ApiError,ApiResponse} from '../utils/apiHanlder.js';
-import {Chat} from '../models/chat.model.js';
-import { emitEvent } from '../utils/features.js';
-import { ALERT, REFETCH_CHATS,NEW_ATTACHMENT,NEW_MESSAGE_ALERT, NEW_MESSAGE } from '../constants/constants.js';
-import { getOtherMember } from '../utils/helper.js';
-import {User} from '../models/user.model.js';
-import {Message} from '../models/message.model.js';
-import {deleteFromCloudinary, uploadToCloudinary} from '../utils/cloudinary.js'
 import { v4 } from 'uuid';
+import { ALERT, NEW_MESSAGE, NEW_MESSAGE_ALERT, REFETCH_CHATS } from '../constants/constants.js';
+import { Chat } from '../models/chat.model.js';
+import { Message } from '../models/message.model.js';
+import { User } from '../models/user.model.js';
+import { ApiError, ApiResponse } from '../utils/apiHanlder.js';
+import { deleteFromCloudinary, uploadToCloudinary } from '../utils/cloudinary.js';
+import { emitEvent } from '../utils/features.js';
+import { getOtherMember } from '../utils/helper.js';
 
 
 
@@ -195,7 +195,10 @@ export const removeMembers = async (req,res) => {
     await chat.save({validateBeforeSave:false});
   
 
-    emitEvent(req,ALERT,chat.members,`${userToBeRemoved.name} is removed from the group`);
+    emitEvent(req,ALERT,chat.members,{
+        message :`${userToBeRemoved.name} is removed from the group`,
+        chatId
+    });
     emitEvent(req,REFETCH_CHATS,memberIds)
 
 
@@ -229,18 +232,23 @@ export const leaveMembers = async (req,res) => {
 
 
 
-    const remaningMembers = chat.members.filter((i) => i !== userId);
+    const remaningMembers = chat.members.filter((i) => i.toString() !== userId.toString());
 
+    
     if (chat.creator.toString() == userId.toString()) {
         const newCreator = remaningMembers[Math.floor(Math.random() * chat.members.length)];
-
+        
         chat.creator = newCreator;
     }
-
+    
+    chat.members = remaningMembers;
     await chat.save({validateBeforeSave:false});
 
 
-    emitEvent(req,ALERT,chat.members,`${req.user.name} left the group`)
+    emitEvent(req,ALERT,chat.members,{
+        message: `${req.user.name} left the group`,
+        chatId
+    })
     emitEvent(req,REFETCH_CHATS,chat.members)
 
     
@@ -319,7 +327,7 @@ export const getChatDetails = async (req,res) => {
         const chat = await Chat.findById(req.params?.id).populate("members","name avatar");
 
         if (!chat) {
-            return res.stauts(400).json(new ApiError(400,"chat not found"))
+            throw new ApiError(400,"chat not found")
         }
 
         res
@@ -423,13 +431,21 @@ export const getMyMessages = async (req,res) => {
     const {page = 1} = req.query;
     const limit = 20;
 
+    const chat = await Chat.findById(id);
+
+    if (!chat) {
+        throw new ApiError(400,"no chat found")
+    }
+
+    // if (!chat.members.includes(req.user?._id)) {
+    //     throw new ApiError(400,"you are not a member of this chat")
+    // }
+
     const skip = (page  -1 ) * limit;
 
     const [messages,numberOfMessages] = await Promise.all([
         Message.find({chat : id})
-        .sort({createdAt : -1})
-        .skip(skip)
-        .limit(limit)
+        .sort({createdAt : 1})
         .populate("sender","name")
         .lean(),
         Message.countDocuments({chat : id})

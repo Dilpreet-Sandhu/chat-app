@@ -76,7 +76,7 @@ const api = createApi({
             credentials: "include",
           };
         },
-        keepUnusedDataFor : 0
+        keepUnusedDataFor : 0,
       }),
       sendAttachment : builder.mutation({
         query : (data) => ({
@@ -131,7 +131,24 @@ const api = createApi({
           credentials:"include",
           body:{members,chatId}
         })
+      }),
+      deleteGroup : builder.mutation({
+        query : ({id}) => ({
+            url : `chats/${id}`,
+            method : "DELETE",
+            credentials:"include",
+        }),
+        invalidatesTags:["Chat"]
+      }),
+      leaveGroup: builder.mutation({
+        query : ({chatId}) => ({
+          url : `chats/leave/${chatId}`,
+          method:"PUT",
+          credentials:"include"
+        }),
+        invalidatesTags:["Chat"]
       })
+      
     };
   },
 });
@@ -151,5 +168,7 @@ export const {
   useNewGroupMutation,
   useRenameGroupMutation,
   useRemoveMemberMutation,
-  useAddMemberMutation
+  useAddMemberMutation,
+  useDeleteGroupMutation,
+  useLeaveGroupMutation
 } = api;

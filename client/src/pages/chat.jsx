@@ -12,7 +12,7 @@ import FileMenu from "../components/dialog/FileMenu";
 import { messageData } from "../components/shared/sample";
 import MessageComponent from "../components/shared/MessageComponent";
 import { getSocket } from "../socket";
-import { ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../utils/constants";
+import { ALERT, CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../utils/constants";
 import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
 import { useSocketEvents } from "../components/auth/hook";
 import { useInfiniteScrollTop } from "6pp";
@@ -21,6 +21,7 @@ import { setIsFileMenu } from "../redux/reducers/misc";
 import { removeNewMessageAlert } from "../redux/reducers/chat";
 import toast from "react-hot-toast";
 import { TypingLoader } from "../components/loaders/loaders";
+import { useNavigate } from "react-router-dom";
 
 const user = {
   _id: "falkfw3320af",
@@ -40,10 +41,13 @@ function Chat({ chatId, user }) {
   const [userTyping, setUserTyping] = useState(false);
   const typingTimeOut = useRef(null);
   const socket = getSocket();
+  const navigate = useNavigate();
 
   const chatDetails = useChatDetailsQuery({ chatId }, { skip: !chatId });
 
-  const members = chatDetails?.data?.data?.members;
+  let members = chatDetails.data?.data?.members;
+  
+
 
   const oldMessagesChunk = useGetMessagesQuery({ chatId, page });
 
@@ -63,7 +67,7 @@ function Chat({ chatId, user }) {
   const submitHandler = (e) => {
     e.preventDefault();
     if (messageArr.length < 0) {
-      toast.error("please refresh socket couldn't refresh sucessfully");
+      return toast.error("please refresh socket couldn't connect sucessfully");
     }
     if (!message.trim()) return;
 
@@ -71,16 +75,20 @@ function Chat({ chatId, user }) {
     setMessage("");
   };
 
-  useEffect(() => {
+  useEffect( () => {
     dispatch(removeNewMessageAlert({ chatId }));
+
+    
 
     return () => {
       setMessageArr([]);
       setMessage("");
       setOldMessages([]);
       setPage(1);
+
     };
   }, [chatId]);
+
 
   const messageChangeHandler = (e) => {
     setMessage(e.target.value);
@@ -126,14 +134,15 @@ function Chat({ chatId, user }) {
   );
 
   const alertHandler = useCallback(
-    (content) => {
+    (data) => {
+      if (data?.chatId !== chatId) return;
       const messageForAlert = {
-        content: 'welcome to my group',
+        content: data.message,
         sender : {
           _id  : "sadfjklaej0320r0g0sertj03",
           name : "admin"
         },
-        chat : chatId,
+        chat : data?.chatId,
         createdAt : new Date().toISOString()
       }
 
@@ -151,9 +160,9 @@ function Chat({ chatId, user }) {
 
   useSocketEvents(socket, eventArr);
 
-  const oldMessegesReversed = oldMessages.reverse();
+  
 
-  const allMessages = [...oldMessegesReversed, ...messageArr];
+  const allMessages = [...oldMessages, ...messageArr];
 
   useEffect(() => {
     if (lastMessageRef.current) {

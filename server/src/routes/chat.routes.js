@@ -23,7 +23,7 @@ chatRouter.route("/my/grps").get(getMyAdminChats);
 chatRouter.route("/my").get(getMyChats);
 chatRouter.route("/add").put(addMembers);
 chatRouter.route("/remove").put(removeMembers);
-chatRouter.route("/del/:chatId").put(leaveMembers);
+chatRouter.route("/leave/:chatId").put(leaveMembers);
 chatRouter
   .route("/send/attachment").post(upload.fields([{name:"photo",maxCount:1}]), sendAttachment);
 chatRouter.route('/messages/:id').get(getMyMessages)

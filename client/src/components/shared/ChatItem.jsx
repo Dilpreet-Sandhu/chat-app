@@ -3,7 +3,8 @@ import { Box, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { memo } from 'react'
-import AvatarBox from './AvatarBox'
+import AvatarBox from './AvatarBox';
+import {motion} from 'framer-motion';
 
 const ChatItem = ({
     avatar=[],
@@ -18,7 +19,8 @@ const ChatItem = ({
 }) => {
   return (
    <Link   to={`/chat/${_id}`} onContextMenu={(e) => handleDeleteChat(e,_id,groupChat)} style={{textDecoration:"none"}}>
-    <div style={{
+    <div
+     style={{
         display:'flex',
         alignItems:"center",
         padding:"1rem",

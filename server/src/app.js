@@ -27,6 +27,7 @@ app.use(express.json({limit : '17kb'}))
 app.use(express.urlencoded());
 app.use(cookieParser());
 export const userSocketIDs = new Map();
+export const onlineUsers = new Set();
 
 app.get('/',(req,res) => {
     res.json({message:"hello world"})
@@ -38,12 +39,12 @@ app.get('/',(req,res) => {
 //routes imports 
 import {userRouter} from './routes/user.routes.js';
 import { chatRouter } from './routes/chat.routes.js';
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from './constants/constants.js';
+import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, NEW_MESSAGE_ALERT } from './constants/constants.js';
 import { v4 } from 'uuid';
 import { getSocket } from './utils/helper.js';
 import { verifySocket } from './middlewares/auth.middleware.js';
 import { Message } from './models/message.model.js';
-import { START_TYPING, STOP_TYPING } from '../../client/src/utils/constants.js';
+import { ONLINE_USERS, START_TYPING, STOP_TYPING } from '../../client/src/utils/constants.js';
 
 app.use('/api/v1/users',userRouter)
 app.use('/api/v1/chats',chatRouter)
@@ -109,6 +110,8 @@ io.on("connection",(socket) => {
 
         socket.to(membersSockets).emit(STOP_TYPING,{members,chatId })
     })
+
+    
 
     socket.on("disconnect",() => {
         userSocketIDs.delete(user._id.toString())

@@ -3,6 +3,7 @@ import moment from 'moment';
 import React, { forwardRef } from 'react'
 import { fileFormat } from '../../lib/feautres';
 import ShowAttachment from './showAttachment';
+import {motion} from 'framer-motion';
 
 const MessageComponent = forwardRef(({message,user},ref) => {
 
@@ -15,7 +16,9 @@ const MessageComponent = forwardRef(({message,user},ref) => {
 
 
   return (
-    <div ref={ref} style={{
+    <div
+
+    ref={ref} style={{
         alignSelf : sameSender ? "flex-end" : "flex-start",
         background:"white",
         color:"black",

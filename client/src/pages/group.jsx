@@ -10,13 +10,14 @@ import {
   TextField,
   Button,
   Backdrop,
+  CircularProgress,
 } from "@mui/material";
 import { Add, Delete, Done, Edit, KeyboardBackspace, Menu } from "@mui/icons-material";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import chats from "../components/shared/sample.js";
 import AvatarBox from "../components/shared/AvatarBox";
 import UserItem from "../components/specific/UserItem.jsx";
-import { useAddMemberMutation, useChatDetailsQuery, useMyChatsQuery, useMyGroupsQuery, useRemoveMemberMutation, useRenameGroupMutation } from "../redux/api/api.js";
+import { useAddMemberMutation, useChatDetailsQuery, useDeleteGroupMutation, useMyChatsQuery, useMyGroupsQuery, useRemoveMemberMutation, useRenameGroupMutation } from "../redux/api/api.js";
 import Loaders from "../components/loaders/loaders.jsx";
 import useAsyncMutation from "../components/auth/hook.jsx";
 import { useDispatch, useSelector } from "react-redux";
@@ -42,6 +43,7 @@ function Group() {
   const [loading,changeGroupName,data] = useAsyncMutation(useRenameGroupMutation);
   const [removeMemberLoading,removeMember,removeMemberData] = useAsyncMutation(useRemoveMemberMutation);
   const [addMemberLoading,addMember,addMemberData] = useAsyncMutation(useAddMemberMutation);
+  const [deleteGroupLoading,deleteGroup] = useAsyncMutation(useDeleteGroupMutation);
 
   
 
@@ -88,6 +90,7 @@ function Group() {
   };
 
   const deleteGroupHandler = () => {
+
     setConfirmDeleteHandler(true)
   }
 
@@ -99,8 +102,9 @@ function Group() {
     dispatch(setAddMember(true))
   }
   const handleDelete = () => {
-    console.log("handle delete")
+    deleteGroup("deleting group",{id : chatId})
     closeDeleteHandler()
+    navigate('/group')
   }
   const removeHandler = (id) => {
     removeMember("removing member",{chatId,userId : id})
@@ -241,14 +245,14 @@ function Group() {
               overflow="auto"
              
             >
-                 {
+                 {  deleteGroupLoading ? <CircularProgress/> :(
                    members.map((chat,idx) => {
                     return <UserItem key={idx} handler={removeHandler} user={chat} isAdded styling={{
                       boxShadow:"0 0 0.5rem rgba(0,0,0,0.2)",
                       padding:"1rem 2rem",
                       borderRadius:"1rem"
                     }}/>
-                   })
+                   }))
                  }
             </Stack>
 

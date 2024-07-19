@@ -7,6 +7,7 @@ import { emitEvent } from "../utils/features.js";
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/constants.js";
 import { getOtherMember } from "../utils/helper.js";
 
+
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, bio } = req.body;
@@ -82,11 +83,14 @@ export const loginUser = async (req, res) => {
   newUser.refreshToken = refreshToken;
   await newUser.save({ validateBeforeSave: false });
 
+
+
+ 
   return res
     .status(200)
     .cookie("accessToken", accessToken,{httpOnly:true,sameSite:"Lax",secure:false})
     .cookie("refreshToken", refreshToken,{httpOnly:true,sameSite:"Lax",secure:false})
-    .json(new ApiResponse(200, {}, "user logged in successfully"));
+    .json(new ApiResponse(200, newUser, "user logged in successfully"));
 };
 
 export const getMyDetails = async (req,res) => {
