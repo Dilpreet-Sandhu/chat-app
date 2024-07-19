@@ -20,7 +20,7 @@ export const io = new Server(server,{
 });
 app.set("io",io)
 app.use(cors({
-    origin : process.env.FRONTEND_URL,
+    origin : process.env.FRONTEND_URL || 'https://chat-app-ruby-seven.vercel.app',
     credentials : true,
 }))
 app.use(express.json({limit : '17kb'}))
