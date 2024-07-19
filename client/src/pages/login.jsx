@@ -32,6 +32,7 @@ function Login() {
   const toggleLogin = () => setIsLoggingIn((prev) => !prev);
   const handleRegister = async (e) => {
     e.preventDefault();
+    
 
     const toastId = toast.loading('registering')
 
@@ -45,7 +46,7 @@ function Login() {
     try {
       setIsLoading(true)
 
-      axios.postForm(`${server}/users/reg`,formData,{withCredentials:true,headers:{"Content-Type":"multipart/form-data"}}).then((res)=> {
+      axios.post(`${server}/users/reg`,formData,{withCredentials:true,headers:{"Content-Type":"multipart/form-data"}}).then((res)=> {
         console.log(res)
         setIsLoggingIn(true)
       }).catch((err) => console.log(err))

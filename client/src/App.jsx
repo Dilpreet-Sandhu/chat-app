@@ -1,14 +1,13 @@
-import React, { Suspense, lazy, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/login.jsx";
+import axios from "axios";
+import React, { lazy, Suspense, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { server } from "./components/auth/config.js";
 import ProtectedRoutes from "./components/auth/protectedRote.jsx";
 import Loaders from "./components/loaders/loaders.jsx";
-import { server } from "./components/auth/config.js";
-import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { userNotExists, userExists } from "./redux/reducers/auth.js";
-import { Toaster } from "react-hot-toast";
-import Cookies from "js-cookie";
+import Login from "./pages/login.jsx";
+import { userExists, userNotExists } from "./redux/reducers/auth.js";
 import { getSocket, SocketProvider } from "./socket.jsx";
 // import {CookiesProvider,Cookies} from 'react-cookie'
 
