@@ -30,7 +30,6 @@ function App() {
   const dispatch = useDispatch();
 
   const socket = getSocket();
-  
 
   useEffect(() => {
     axios
@@ -45,7 +44,13 @@ function App() {
     <BrowserRouter>
       <Suspense fallback={<Loaders />}>
         <Routes>
-          <Route element={<SocketProvider><ProtectedRoutes user={user} /></SocketProvider>}>
+          <Route
+            element={
+              <SocketProvider>
+                <ProtectedRoutes user={user} />
+              </SocketProvider>
+            }
+          >
             <Route path="/" element={<Home />} />
             <Route path="/chat/:chatId" element={<Chat />} />
             <Route path="/group" element={<Group />} />
@@ -59,16 +64,31 @@ function App() {
             }
           />
 
-          <Route path="/admin" element={<AdminLogin />} />
+          {/* <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/user-managment" element={<UserMangement />} />
           <Route path="/admin/chat-management" element={<ChatManagement />} />
           <Route
             path="/admin/message-management"
             element={<MessageManagement />}
-          />
+          /> */}
 
-          <Route path="*" element={<h1>Error 404 not found</h1>} />
+          <Route
+            path="*"
+            element={
+              <h1
+                style={{
+                  width: "100%",
+                  height: "100vh",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                Error 404 not found
+              </h1>
+            }
+          />
         </Routes>
       </Suspense>
       <Toaster position="top-center" />
