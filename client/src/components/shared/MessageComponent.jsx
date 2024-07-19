@@ -16,7 +16,10 @@ const MessageComponent = forwardRef(({message,user},ref) => {
 
 
   return (
-    <div
+    <motion.div
+    
+      initial={{opacity:0,x : "-100%"}}
+      whileInView={{opacity:1,x:"0"}}
 
     ref={ref} style={{
         alignSelf : sameSender ? "flex-end" : "flex-start",
@@ -50,7 +53,7 @@ const MessageComponent = forwardRef(({message,user},ref) => {
 
     <Typography variant='caption' color={"text.secondary"}>{timeAgo}</Typography>
       
-    </div>
+    </motion.div>
   )
 })
 
