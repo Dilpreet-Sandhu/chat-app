@@ -33,6 +33,7 @@ function Login() {
   const handleRegister = async (e) => {
     e.preventDefault();
     
+    setIsLoading(true)
 
     const toastId = toast.loading('registering')
 
@@ -44,7 +45,6 @@ function Login() {
     formData.append("bio", bio.value);
 
     try {
-      setIsLoading(true)
 
       axios.post(`${server}/users/reg`,formData,{withCredentials:true,headers:{"Content-Type":"multipart/form-data"}}).then((res)=> {
         console.log(res)
