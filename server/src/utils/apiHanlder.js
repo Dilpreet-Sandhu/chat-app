@@ -22,6 +22,6 @@ export class ApiResponse {
 }
 
 export const cookieOptions = {
-    httponly : true,
+    httpOnly : true,
     secure:true
 }
