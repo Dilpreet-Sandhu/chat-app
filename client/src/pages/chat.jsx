@@ -70,6 +70,7 @@ function Chat({ chatId, user }) {
       return toast.error("please refresh socket couldn't connect sucessfully");
     }
     if (!message.trim()) return;
+    console.log(message)
 
     socket.emit(NEW_MESSAGE, { chatId: chatId, members: members, message });
     setMessage("");
@@ -111,6 +112,8 @@ function Chat({ chatId, user }) {
   const newMessageHandler = useCallback(
     (data) => {
       if (data?.chatId !== chatId) return;
+
+      console.log(data)
 
       setMessageArr((prev) => [...prev, data?.message]);
     },
