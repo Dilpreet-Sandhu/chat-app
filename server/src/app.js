@@ -26,7 +26,7 @@ app.use(cors({
 app.use(express.json({limit : '17kb'}))
 app.use(express.urlencoded());
 app.use(cookieParser());
-app.use()
+
 
 export const userSocketIDs = new Map();
 export const onlineUsers = new Set();
