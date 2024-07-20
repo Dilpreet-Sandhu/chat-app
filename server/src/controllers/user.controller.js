@@ -88,8 +88,8 @@ export const loginUser = async (req, res) => {
  
   return res
     .status(200)
-    .cookie("accessToken", accessToken,{httpOnly:true,sameSite:"Lax",secure:false})
-    .cookie("refreshToken", refreshToken,{httpOnly:true,sameSite:"Lax",secure:false})
+    .cookie("accessToken", accessToken,{httpOnly:true,sameSite:"none",secure:true})
+    .cookie("refreshToken", refreshToken,{httpOnly:true,sameSite:"none",secure:true})
     .json(new ApiResponse(200, newUser, "user logged in successfully"));
 };
 

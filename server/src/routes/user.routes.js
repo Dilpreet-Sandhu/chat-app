@@ -25,3 +25,4 @@ userRouter.route("/sendReq").put(verifyJWT, sendFriendRequest);
 userRouter.route("/acceptReq").put(verifyJWT, acceptFriendRequest);
 userRouter.route('/getNotif').get(verifyJWT,getAllNotificatin)
 userRouter.route('/getMyFriends').get(verifyJWT,getMyFriends)
+

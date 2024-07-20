@@ -305,7 +305,7 @@ const GroupItem = ({ group, chatId }) => {
   return (
     <Link
       to={`?group=${chatId}`}
-      onClick={(e) => chatId === _id ?? e.preventDefault()}
+      onClick={(e) => chatId === _id && e.preventDefault()}
       style={{ textDecoration: "none" }}
       color="black"
     >

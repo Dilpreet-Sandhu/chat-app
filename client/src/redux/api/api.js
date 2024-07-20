@@ -3,7 +3,7 @@ import { server } from "../../components/auth/config";
 
 const api = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({ baseUrl: `${server}` }),
+  baseQuery: fetchBaseQuery({ baseUrl: `${server}/api/v1` }),
   tagTypes: ["Chat", "User","Message"],
   endpoints: (builder) => {
     return {

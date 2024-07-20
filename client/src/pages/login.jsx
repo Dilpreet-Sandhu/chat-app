@@ -21,7 +21,7 @@ import { usernameValidator } from "../utils/usernameValidator";
 
 function Login() {
   const [isLoggingIn, setIsLoggingIn] = useState(true);
-  const [isLoading,setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const username = useInputValidation("", usernameValidator);
   const email = useInputValidation("");
@@ -32,10 +32,10 @@ function Login() {
   const toggleLogin = () => setIsLoggingIn((prev) => !prev);
   const handleRegister = async (e) => {
     e.preventDefault();
-    
-    setIsLoading(true)
 
-    const toastId = toast.loading('registering')
+    setIsLoading(true);
+
+    const toastId = toast.loading("registering");
 
     const formData = new FormData();
     formData.append("avatar", avatar.file);
@@ -45,21 +45,23 @@ function Login() {
     formData.append("bio", bio.value);
 
     try {
+      axios
+        .post(`${server}/api/v1/users/reg`, formData, {
+          withCredentials: true,
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then((res) => {
+          console.log(res);
+          setIsLoggingIn(true);
+        })
+        .catch((err) => console.log(err));
 
-      axios.post(`${server}/users/reg`,formData,{withCredentials:true,headers:{"Content-Type":"multipart/form-data"}}).then((res)=> {
-        console.log(res)
-        setIsLoggingIn(true)
-      }).catch((err) => console.log(err))
-
-      toast.success('user created succesfully',{id:toastId})
-      
-      
+      toast.success("user created succesfully", { id: toastId });
     } catch (error) {
-      console.log(error)
-    }finally{
-      setIsLoading(false)
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
-    
   };
 
   const dispatch = useDispatch();
@@ -67,34 +69,33 @@ function Login() {
   const handleLogin = async (e) => {
     const config = {
       withCredentials: true,
-     
     };
     e.preventDefault();
 
-    const toastId = toast.loading('logging in');
+    const toastId = toast.loading("logging in");
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     axios
-      .post(`${server}/users/login`, {
-        email: email.value,
-        password: password.value,
-      },config)
+      .post(
+        `${server}/api/v1/users/login`,
+        {
+          email: email.value,
+          password: password.value,
+        },
+        config
+      )
       .then((data) => {
-        console.log(data?.data?.data)
+        console.log(data?.data?.data);
         dispatch(userExists(data.data?.data));
         email.value = "";
         password.value = "";
-        
-      
-        
       })
       .catch((err) => dispatch(userNotExists()))
       .finally(() => {
-        setIsLoading(false)
-      })
-      ;
-    toast.success('user logged in successfully',{id:toastId});
+        setIsLoading(false);
+      });
+    toast.success("user logged in successfully", { id: toastId });
   };
 
   return (
