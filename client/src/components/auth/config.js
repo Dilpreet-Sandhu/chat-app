@@ -1,3 +1,3 @@
 
 
-export const server =  "https://chat-app-uzs8.onrender.com";
+export const server =  "https://chat-app-uzs8.onrender.com/api/v1";
