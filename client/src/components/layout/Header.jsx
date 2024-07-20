@@ -57,7 +57,7 @@ function Header() {
 
   const handleLogout = () => {
     axios
-      .get(`${server}/users/logout`, { withCredentials: true })
+      .get(`${server}/api/v1/users/logout`, { withCredentials: true })
       .then((res) => {
         dispatch(userNotExists());
         navigate('/login')

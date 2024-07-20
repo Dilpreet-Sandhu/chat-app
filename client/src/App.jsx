@@ -32,7 +32,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get(`${server}/users/getmyprofile`, { withCredentials: true })
+      .get(`${server}/api/v1/users/getmyprofile`, { withCredentials: true })
       .then((data) => {
         dispatch(userExists(data.data.data));
       })

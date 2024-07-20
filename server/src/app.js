@@ -65,6 +65,8 @@ io.on("connection",(socket) => {
 
     userSocketIDs.set(user._id.toString(),socket.id);
 
+
+    console.log(userSocketIDs)
   
     
     
