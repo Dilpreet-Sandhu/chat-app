@@ -5,7 +5,7 @@ import { NEW_MESSAGE_ALERT } from "../../utils/constants";
 
 const initialState = {
     notificationCount : 0,
-    newMessageAlert : getOrSaveFromLocalStorage({get :true,key : NEW_MESSAGE_ALERTc}) ||[]
+    newMessageAlert : getOrSaveFromLocalStorage({get :true,key : NEW_MESSAGE_ALERT}) ||[]
 }
 
 
