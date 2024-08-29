@@ -15,7 +15,7 @@ export const registerUser = async (req, res) => {
     if ([name, email, password].some((item) => item == "")) {
      return res.json(new ApiError(400, "name, email and password are required"));
     }
-    const avatarPath = req?.file?.path;
+    const avatarPath = req?.file?.path ||"";
 
     const avatar = await uploadToCloudinary(avatarPath);
 

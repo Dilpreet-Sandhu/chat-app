@@ -214,6 +214,7 @@ function Login() {
                   >
                     <CameraAlt />
                     <input
+                      required={false}
                       type="file"
                       style={{
                         border: 0,
