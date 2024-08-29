@@ -15,18 +15,16 @@ export const registerUser = async (req, res) => {
     if ([name, email, password].some((item) => item == "")) {
      return res.json(new ApiError(400, "name, email and password are required"));
     }
-    const avatarPath = req.file.path;
+    const avatarPath = req?.file?.path;
 
     const avatar = await uploadToCloudinary(avatarPath);
 
-    if (!avatar) {
-      return  res.json(new ApiError(400, "couldn't upload to cloudinary"));
-    }
+  
 
     const user = await User.create({
       name,
       email,
-      avatar: avatar.url,
+      avatar: avatar?.url || "",
       password,
       bio,
     });
