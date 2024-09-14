@@ -78,7 +78,7 @@ function Group() {
   const updateGroupName = () => {
     setIsEdit(false);
     changeGroupName("updating group name",{chatId,newName : groupNameUpdatedValue})
-    console.log(data)
+
   }
 
   const handleMobile = () => {
@@ -278,7 +278,7 @@ function Group() {
         open={isMobileOpen}
         onClose={handleMobileClose}
       >
-        <GroupList myGroups={chats} w="50vw" chatId={chatId} />
+        <GroupList myGroups={myGroups?.data.data} w="50vw" chatId={chatId} />
       </Drawer>
     </Grid>
   );
@@ -305,7 +305,6 @@ const GroupItem = ({ group, chatId }) => {
   return (
     <Link
       to={`?group=${chatId}`}
-      onClick={(e) => chatId === _id && e.preventDefault()}
       style={{ textDecoration: "none" }}
       color="black"
     >

@@ -51,12 +51,13 @@ function Login() {
           headers: { "Content-Type": "multipart/form-data" },
         })
         .then((res) => {
-          console.log(res);
-          setIsLoggingIn(true);
+          if (res.data.status == 201) {
+            setIsLoggingIn(true);
+            toast.success("user created succesfully", { id: toastId });
+          }
         })
         .catch((err) => console.log(err));
 
-      toast.success("user created succesfully", { id: toastId });
     } catch (error) {
       console.log(error);
     } finally {
@@ -72,7 +73,7 @@ function Login() {
     };
     e.preventDefault();
 
-    const toastId = toast.loading("logging in");
+  
 
     setIsLoading(true);
 
@@ -86,16 +87,20 @@ function Login() {
         config
       )
       .then((data) => {
-        console.log(data?.data?.data);
         dispatch(userExists(data.data?.data));
         email.value = "";
         password.value = "";
+        if (data?.data.status == 200) {
+          toast.success("user logged in successfully");
+        }else if (data?.data.statusCode == 400) {
+          toast.error(data?.data?.message);
+        }
       })
       .catch((err) => dispatch(userNotExists()))
       .finally(() => {
         setIsLoading(false);
       });
-    toast.success("user logged in successfully", { id: toastId });
+    
   };
 
   return (

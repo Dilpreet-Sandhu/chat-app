@@ -6,7 +6,7 @@ import { Request } from "../models/request.model.js";
 import { emitEvent } from "../utils/features.js";
 import { NEW_REQUEST, REFETCH_CHATS } from "../constants/constants.js";
 import { getOtherMember } from "../utils/helper.js";
-
+ 
 
 export const registerUser = async (req, res) => {
   try {
@@ -15,11 +15,13 @@ export const registerUser = async (req, res) => {
     if ([name, email, password].some((item) => item == "")) {
      return res.json(new ApiError(400, "name, email and password are required"));
     }
-    const avatarPath = req?.file?.path ||"";
+    const avatarPath = req?.file?.path || "";
 
-    const avatar = await uploadToCloudinary(avatarPath);
+    let avatar;
 
-  
+    if (avatarPath) {
+      avatar = await uploadToCloudinary(avatarPath);
+    }
 
     const user = await User.create({
       name,
@@ -33,9 +35,10 @@ export const registerUser = async (req, res) => {
       return res.json(new ApiError(400, "couldn't generate user")) ;
     }
 
-    res
+    return res
       .status(200)
       .json(new ApiResponse(201, user, "user created successfully"));
+    
   } catch (error) {
     console.log(error);
   }
