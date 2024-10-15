@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import {Server} from 'socket.io';
 import {createServer} from 'node:http'
-
+import cron from 'node-cron';
 dotenv.config();
 
 
@@ -30,9 +30,10 @@ app.use(cookieParser());
 
 export const userSocketIDs = new Map();
 export const onlineUsers = new Set();
-
-app.get('/',(req,res) => {
-    res.json({message:"hello world"})
+cron.schedule("*/10 * * * *",() => {
+    app.get('/',(req,res) => {
+        res.json({message:"hello world"})
+    })
 })
 
 
